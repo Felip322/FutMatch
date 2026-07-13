@@ -24,6 +24,16 @@
             <small>uniforme não informado</small>
             {% endif %}
         </div>
+        {% if current_user.is_admin or match.home_team.owner_id == current_user.id %}
+        <form method="post" action="/matches/{{ match.id }}/uniform" class="match-uniform-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="side" value="home">
+            <label><span>Camisa</span><input class="uniform-color-picker" type="color" name="shirt_color_hex" value="{{ match.home_uniform_parts[0].color if match.home_uniform_parts|length > 0 else '#22c55e' }}"></label>
+            <label><span>Calção</span><input class="uniform-color-picker" type="color" name="shorts_color_hex" value="{{ match.home_uniform_parts[1].color if match.home_uniform_parts|length > 1 else '#111827' }}"></label>
+            <label><span>Meião</span><input class="uniform-color-picker" type="color" name="socks_color_hex" value="{{ match.home_uniform_parts[2].color if match.home_uniform_parts|length > 2 else '#ffffff' }}"></label>
+            <button class="btn ghost" type="submit">Atualizar mandante</button>
+        </form>
+        {% endif %}
         <div class="team-uniform-row">
             <strong>Visitante:</strong>
             <span>{{ match.away_team.name }}</span>
@@ -37,6 +47,16 @@
             <small>uniforme não informado</small>
             {% endif %}
         </div>
+        {% if current_user.is_admin or match.away_team.owner_id == current_user.id %}
+        <form method="post" action="/matches/{{ match.id }}/uniform" class="match-uniform-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="side" value="away">
+            <label><span>Camisa</span><input class="uniform-color-picker" type="color" name="shirt_color_hex" value="{{ match.away_uniform_parts[0].color if match.away_uniform_parts|length > 0 else '#2563eb' }}"></label>
+            <label><span>Calção</span><input class="uniform-color-picker" type="color" name="shorts_color_hex" value="{{ match.away_uniform_parts[1].color if match.away_uniform_parts|length > 1 else '#ffffff' }}"></label>
+            <label><span>Meião</span><input class="uniform-color-picker" type="color" name="socks_color_hex" value="{{ match.away_uniform_parts[2].color if match.away_uniform_parts|length > 2 else '#2563eb' }}"></label>
+            <button class="btn ghost" type="submit">Atualizar visitante</button>
+        </form>
+        {% endif %}
         <p><strong>Status:</strong> {{ match.status }}</p>
         <p><strong>Resultado:</strong> {{ match.result_status }}</p>
         <p>{{ match.notes or "Amistoso confirmado entre os responsáveis dos times." }}</p>
