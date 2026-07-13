@@ -23,14 +23,6 @@
         DF: ["Brasilia"],
     };
 
-    const neighborhoodBase = {
-        "SAO PAULO": ["Aclimacao", "Agua Branca", "Bela Vista", "Bom Retiro", "Brooklin", "Butanta", "Campo Belo", "Capao Redondo", "Casa Verde", "Centro", "Consolacao", "Freguesia do O", "Ipiranga", "Itaquera", "Jabaquara", "Lapa", "Liberdade", "Moema", "Mooca", "Morumbi", "Penha", "Perdizes", "Pinheiros", "Santana", "Santo Amaro", "Saude", "Tatuape", "Vila Mariana", "Vila Prudente"],
-        "GUARULHOS": ["Centro", "Cocaia", "Gopouva", "Jardim Maia", "Picanco", "Ponte Grande", "Taboao", "Vila Galvao"],
-        "CAMPINAS": ["Barao Geraldo", "Cambui", "Centro", "Jardim Chapadao", "Nova Campinas", "Taquaral", "Vila Industrial"],
-        "RIO DE JANEIRO": ["Barra da Tijuca", "Botafogo", "Campo Grande", "Centro", "Copacabana", "Flamengo", "Jacarepagua", "Madureira", "Meier", "Recreio dos Bandeirantes", "Tijuca"],
-        "BELO HORIZONTE": ["Barreiro", "Buritis", "Centro", "Funcionarios", "Lourdes", "Pampulha", "Savassi", "Venda Nova"],
-    };
-
     const normalize = (value) => (value || "")
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -84,44 +76,6 @@
         return form?.querySelector(`[name="${name}"]`) || document.querySelector(`[name="${name}"]`);
     };
 
-    const renderNeighborhoodButtons = (field, suggestions) => {
-        if (!field) return;
-        const wrapper = field.closest(".form-field") || field.parentElement;
-        if (!wrapper) return;
-        wrapper.querySelector(".location-suggestion-list")?.remove();
-        if (!suggestions.length) return;
-        const list = document.createElement("div");
-        list.className = "location-suggestion-list";
-        suggestions.slice(0, 12).forEach((item) => {
-            const button = document.createElement("button");
-            button.type = "button";
-            button.className = "location-suggestion";
-            button.textContent = upper(item, true);
-            button.addEventListener("click", () => {
-                field.value = upper(item, true);
-                field.dispatchEvent(new Event("input", { bubbles: true }));
-                field.dispatchEvent(new Event("change", { bubbles: true }));
-            });
-            list.appendChild(button);
-        });
-        wrapper.appendChild(list);
-    };
-
-    const updateNeighborhoods = (field) => {
-        if (!field) return;
-        const form = field.closest("form");
-        const cityField = form?.querySelector('[name="city"]') || document.querySelector('[name="city"]');
-        const neighborhoodField = form?.querySelector('[name="neighborhood"]') || document.querySelector('[name="neighborhood"]');
-        const city = normalize(cityField?.value);
-        const suggestions = neighborhoodBase[city] || [];
-        fillDatalist("brazil-neighborhoods-list", suggestions);
-        if (neighborhoodField) {
-            neighborhoodField.setAttribute("list", "brazil-neighborhoods-list");
-            neighborhoodField.placeholder = suggestions.length ? "SELECIONE OU DIGITE O BAIRRO" : "DIGITE O BAIRRO";
-            renderNeighborhoodButtons(neighborhoodField, suggestions);
-        }
-    };
-
     const updateCities = async (stateField) => {
         const uf = normalize(stateField.value).slice(0, 2);
         stateField.value = uf;
@@ -132,7 +86,6 @@
             cityField.placeholder = uf ? `Cidade de ${stateName(uf)}` : "Cidade";
             cityField.setAttribute("list", "brazil-cities-list");
         }
-        updateNeighborhoods(cityField || stateField);
     };
 
     const setup = () => {
@@ -160,25 +113,19 @@
             });
             field.addEventListener("input", () => {
                 field.value = upper(field.value);
-                updateNeighborhoods(field);
             });
             field.addEventListener("change", () => {
                 field.value = upper(field.value, true);
-                updateNeighborhoods(field);
-                relatedField(field, "neighborhood")?.focus();
             });
-            if (field.value) updateNeighborhoods(field);
         });
 
         document.querySelectorAll('input[name="neighborhood"]').forEach((field) => {
-            field.setAttribute("list", "brazil-neighborhoods-list");
+            field.removeAttribute("list");
             field.autocomplete = "address-level3";
             if (field.value) field.value = upper(field.value);
             field.addEventListener("input", () => {
                 field.value = upper(field.value);
             });
-            field.addEventListener("focus", () => updateNeighborhoods(field));
-            if (field.value) updateNeighborhoods(field);
         });
     };
 
