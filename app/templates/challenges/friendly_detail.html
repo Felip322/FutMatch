@@ -47,16 +47,16 @@
             <strong>Ao solicitar, seu time confirma:</strong>
             <span><i class="bi bi-check-circle"></i>Horário do jogo</span>
             <span><i class="bi bi-check-circle"></i>Local combinado</span>
-            <span><i class="bi bi-check-circle"></i>Uniforme claro, escuro ou a combinar</span>
+            <span><i class="bi bi-check-circle"></i>Uniforme do seu time</span>
         </div>
         <form method="post" action="{{ url_for('challenges.request_friendly', id=post.id) }}" class="request-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <label class="check"><input type="checkbox" name="confirms_time" checked><span>Confirmamos o horário</span></label>
             <label class="check"><input type="checkbox" name="accepts_location" checked><span>Aceitamos o local</span></label>
-            <label class="form-field"><span>Uniforme do nosso time</span><select class="input" name="uniform_color"><option>Claro</option><option>Escuro</option><option>A combinar</option></select></label>
+            <label class="form-field"><span>Uniforme do nosso time</span><input class="input" name="uniform_color" placeholder="Ex: camisa azul, calção branco e meião azul"></label>
             <div class="preset-messages">
-                <button type="button" class="btn ghost" data-message-preset="Confirmamos horário e local. Temos uniforme claro.">Horário + local</button>
-                <button type="button" class="btn ghost" data-message-preset="Temos uniforme escuro e podemos chegar 15 minutos antes.">Uniforme escuro</button>
+                <button type="button" class="btn ghost" data-message-preset="Confirmamos horário e local. Vamos informar o uniforme do nosso time.">Horário + local</button>
+                <button type="button" class="btn ghost" data-message-preset="Nosso uniforme será camisa azul, calção branco e meião azul.">Uniforme completo</button>
                 <button type="button" class="btn ghost" data-message-preset="Podemos chegar 15 minutos antes e respeitamos as regras combinadas.">Chegada antecipada</button>
             </div>
             <label class="form-field"><span>Observação opcional</span><textarea class="input" name="message" id="request-message" placeholder="Ex: Nosso time confirma esse horário."></textarea></label>

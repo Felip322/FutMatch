@@ -60,6 +60,16 @@ def court_has_conflict(court_id, match_date, start_time, duration_minutes, ignor
     return any(time_ranges_overlap(start_time, duration_minutes, post.start_time, post.duration_minutes) for post in query)
 
 
+def build_uniform_description(form):
+    pieces = [
+        ("Camisa", form.get("shirt_color")),
+        ("Calção", form.get("shorts_color")),
+        ("Meião", form.get("socks_color")),
+    ]
+    description = " / ".join(f"{label}: {value.strip()}" for label, value in pieces if value and value.strip())
+    return description or form.get("uniform")
+
+
 @challenges_bp.route("/opponents")
 @login_required
 def opponents():
@@ -144,7 +154,7 @@ def create_friendly():
             duration_minutes=duration_minutes,
             players_count=int(request.form.get("players_count") or 5),
             tolerance_minutes=int(request.form.get("tolerance_minutes") or 10),
-            uniform=request.form.get("uniform"),
+            uniform=build_uniform_description(request.form),
             rules=request.form.get("rules"),
             notes=request.form.get("notes"),
         )

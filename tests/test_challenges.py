@@ -3,6 +3,7 @@ from datetime import date, time
 from app import create_app
 from app.extensions import db
 from app.models import FriendlyMatchPost, Team, User
+from app.routes.challenges import build_uniform_description
 from config import TestConfig
 
 
@@ -27,3 +28,13 @@ def test_friendly_post_model_persists():
         ))
         db.session.commit()
         assert FriendlyMatchPost.query.count() == 1
+
+
+def test_build_uniform_description_uses_full_uniform_parts():
+    uniform = build_uniform_description({
+        "shirt_color": "verde",
+        "shorts_color": "preto",
+        "socks_color": "branco",
+    })
+
+    assert uniform == "Camisa: verde / Calção: preto / Meião: branco"
