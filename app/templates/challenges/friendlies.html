@@ -27,19 +27,25 @@
 <section class="friendly-grid">
     {% for post in posts %}
     <article class="friendly-card">
-        <div class="date-tile"><strong>{{ post.match_date.strftime("%d") }}</strong><span>{{ post.match_date.strftime("%b") }}</span></div>
-        <div class="friendly-card-body">
-            <div class="card-title-row">
+        <div class="friendly-card-head">
+            <div class="date-tile"><strong>{{ post.match_date.strftime("%d") }}</strong><span>{{ post.match_date.strftime("%b") }}</span></div>
+            <div class="friendly-title">
                 <div>
                     <h3>{{ post.team.name }}</h3>
                     <p>{{ post.start_time.strftime("%H:%M") }} - {{ post.city }}{% if post.neighborhood %}, {{ post.neighborhood }}{% endif %}</p>
                 </div>
-                <span class="status-badge status-{{ 'open' if post.status == 'Aberto' else 'requests' if post.status == 'Com solicitacoes' else 'confirmed' if post.status == 'Confirmado' else 'cancelled' if post.status == 'Cancelado' else 'done' if post.status == 'Realizado' else 'review' if post.status == 'Em revisao' else 'neutral' }}">{{ post.status|status_label }}</span>
             </div>
-            <div class="friendly-meta">
+            <span class="status-badge status-{{ 'open' if post.status == 'Aberto' else 'requests' if post.status == 'Com solicitacoes' else 'confirmed' if post.status == 'Confirmado' else 'cancelled' if post.status == 'Cancelado' else 'done' if post.status == 'Realizado' else 'review' if post.status == 'Em revisao' else 'neutral' }}">{{ post.status|status_label }}</span>
+        </div>
+        <div class="friendly-card-body">
+            {% if post.team_badges %}
+            <div class="friendly-badges" aria-label="Selos do time">
                 {% for item in post.team_badges %}
                 <span class="mini-badge"><img src="{{ url_for('static', filename='images/badges/' ~ item.badge.icon ~ '.svg') }}" alt="">{{ item.badge.name }}</span>
                 {% endfor %}
+            </div>
+            {% endif %}
+            <div class="friendly-info-grid">
                 <span><i class="bi bi-geo-alt"></i>{{ post.location_name }}</span>
                 {% if post.court %}<span class="court-chip"><i class="bi bi-check-circle"></i>Quadra cadastrada</span>{% endif %}
                 {% if post.court and post.court.latitude and post.court.longitude %}<a class="court-chip" href="https://www.google.com/maps?q={{ post.court.latitude }},{{ post.court.longitude }}" target="_blank" rel="noopener"><i class="bi bi-signpost"></i>Ver rota</a>{% endif %}

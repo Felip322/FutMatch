@@ -27,9 +27,11 @@
     .hero-actions, .actions-inline { flex-direction: column; align-items: stretch; }
     .profile-head, .match-room { align-items: flex-start; flex-direction: column; padding: 20px; }
     .toast-stack { left: 12px; right: 12px; top: 74px; }
-    .friendly-card { grid-template-columns: 1fr; }
+    .friendly-card-head { grid-template-columns: 68px minmax(0, 1fr); align-items: flex-start; }
+    .friendly-card-head .status-badge { grid-column: 2; justify-self: flex-start; }
+    .friendly-info-grid { grid-template-columns: 1fr; }
     .team-mini-profile { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .date-tile { width: 100%; height: auto; min-height: 70px; grid-template-columns: auto auto; gap: 8px; }
+    .date-tile { width: 68px; min-height: 68px; }
     .sticky-filter { top: 66px; }
     .form-footer { flex-direction: column-reverse; }
     .onboarding-strip { grid-template-columns: 1fr; }
