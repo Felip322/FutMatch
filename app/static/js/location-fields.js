@@ -23,12 +23,12 @@
         DF: ["Brasilia"],
     };
 
-    const neighborhoods = {
-        "SP|SAO PAULO": ["Aclimacao", "Agua Branca", "Bela Vista", "Bom Retiro", "Brooklin", "Butanta", "Campo Belo", "Capao Redondo", "Casa Verde", "Centro", "Consolacao", "Freguesia do O", "Ipiranga", "Itaquera", "Jabaquara", "Lapa", "Liberdade", "Moema", "Mooca", "Morumbi", "Penha", "Perdizes", "Pinheiros", "Santana", "Santo Amaro", "Saude", "Tatuape", "Vila Mariana", "Vila Prudente"],
-        "SP|GUARULHOS": ["Centro", "Cocaia", "Gopouva", "Jardim Maia", "Picanço", "Ponte Grande", "Taboao", "Vila Galvao"],
-        "SP|CAMPINAS": ["Barao Geraldo", "Cambui", "Centro", "Jardim Chapadao", "Nova Campinas", "Taquaral", "Vila Industrial"],
-        "RJ|RIO DE JANEIRO": ["Barra da Tijuca", "Botafogo", "Campo Grande", "Centro", "Copacabana", "Flamengo", "Jacarepagua", "Madureira", "Méier", "Recreio dos Bandeirantes", "Tijuca"],
-        "MG|BELO HORIZONTE": ["Barreiro", "Buritis", "Centro", "Funcionarios", "Lourdes", "Pampulha", "Savassi", "Venda Nova"],
+    const neighborhoodBase = {
+        "SAO PAULO": ["Aclimacao", "Agua Branca", "Bela Vista", "Bom Retiro", "Brooklin", "Butanta", "Campo Belo", "Capao Redondo", "Casa Verde", "Centro", "Consolacao", "Freguesia do O", "Ipiranga", "Itaquera", "Jabaquara", "Lapa", "Liberdade", "Moema", "Mooca", "Morumbi", "Penha", "Perdizes", "Pinheiros", "Santana", "Santo Amaro", "Saude", "Tatuape", "Vila Mariana", "Vila Prudente"],
+        "GUARULHOS": ["Centro", "Cocaia", "Gopouva", "Jardim Maia", "Picanco", "Ponte Grande", "Taboao", "Vila Galvao"],
+        "CAMPINAS": ["Barao Geraldo", "Cambui", "Centro", "Jardim Chapadao", "Nova Campinas", "Taquaral", "Vila Industrial"],
+        "RIO DE JANEIRO": ["Barra da Tijuca", "Botafogo", "Campo Grande", "Centro", "Copacabana", "Flamengo", "Jacarepagua", "Madureira", "Meier", "Recreio dos Bandeirantes", "Tijuca"],
+        "BELO HORIZONTE": ["Barreiro", "Buritis", "Centro", "Funcionarios", "Lourdes", "Pampulha", "Savassi", "Venda Nova"],
     };
 
     const normalize = (value) => (value || "")
@@ -42,13 +42,18 @@
         return item ? item[1] : uf;
     };
 
-    const fillDatalist = (id, items) => {
+    const fillDatalist = (id, items, withLabels = false) => {
         const list = document.getElementById(id);
         if (!list) return;
         list.innerHTML = "";
         items.forEach((item) => {
             const option = document.createElement("option");
-            option.value = item;
+            if (Array.isArray(item)) {
+                option.value = item[0];
+                if (withLabels) option.label = item[1];
+            } else {
+                option.value = item;
+            }
             list.appendChild(option);
         });
     };
@@ -74,6 +79,20 @@
         return form?.querySelector(`[name="${name}"]`) || document.querySelector(`[name="${name}"]`);
     };
 
+    const updateNeighborhoods = (field) => {
+        if (!field) return;
+        const form = field.closest("form");
+        const cityField = form?.querySelector('[name="city"]') || document.querySelector('[name="city"]');
+        const neighborhoodField = form?.querySelector('[name="neighborhood"]') || document.querySelector('[name="neighborhood"]');
+        const city = normalize(cityField?.value);
+        const suggestions = neighborhoodBase[city] || [];
+        fillDatalist("brazil-neighborhoods-list", suggestions);
+        if (neighborhoodField) {
+            neighborhoodField.setAttribute("list", "brazil-neighborhoods-list");
+            neighborhoodField.placeholder = suggestions.length ? "Selecione ou digite o bairro" : "Digite o bairro";
+        }
+    };
+
     const updateCities = async (stateField) => {
         const uf = normalize(stateField.value).slice(0, 2);
         stateField.value = uf;
@@ -87,17 +106,8 @@
         updateNeighborhoods(cityField || stateField);
     };
 
-    const updateNeighborhoods = (field) => {
-        if (!field) return;
-        const form = field.closest("form");
-        const stateField = form?.querySelector('[name="state"]') || document.querySelector('[name="state"]');
-        const cityField = form?.querySelector('[name="city"]') || document.querySelector('[name="city"]');
-        const key = `${normalize(stateField?.value).slice(0, 2)}|${normalize(cityField?.value)}`;
-        fillDatalist("brazil-neighborhoods-list", neighborhoods[key] || []);
-    };
-
     const setup = () => {
-        fillDatalist("brazil-states-list", states.map(([code, name]) => `${code} - ${name}`));
+        fillDatalist("brazil-states-list", states, true);
 
         document.querySelectorAll('input[name="state"]').forEach((field) => {
             field.setAttribute("list", "brazil-states-list");
@@ -120,12 +130,14 @@
             });
             field.addEventListener("input", () => updateNeighborhoods(field));
             field.addEventListener("change", () => updateNeighborhoods(field));
+            if (field.value) updateNeighborhoods(field);
         });
 
         document.querySelectorAll('input[name="neighborhood"]').forEach((field) => {
             field.setAttribute("list", "brazil-neighborhoods-list");
             field.autocomplete = "address-level3";
             field.addEventListener("focus", () => updateNeighborhoods(field));
+            if (field.value) updateNeighborhoods(field);
         });
     };
 

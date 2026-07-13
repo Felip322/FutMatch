@@ -3,7 +3,7 @@
 <section class="split-layout">
     <form method="post" class="form-card">
         {{ form.hidden_tag() }}<h1>Editar perfil</h1>
-        {{ field(form.name) }}{{ field(form.nickname) }}{{ field(form.phone) }}{{ field(form.city) }}{{ field(form.state) }}{{ field(form.neighborhood) }}
+        {{ field(form.name) }}{{ field(form.nickname) }}{{ field(form.phone) }}{{ field(form.state) }}{{ field(form.city) }}{{ field(form.neighborhood) }}
         {{ form.submit(class_="btn accent full") }}
     </form>
     <form method="post" action="{{ url_for('auth.change_password') }}" class="form-card">
