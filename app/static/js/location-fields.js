@@ -37,6 +37,8 @@
         .trim()
         .toUpperCase();
 
+    const upper = (value) => (value || "").trim().toLocaleUpperCase("pt-BR");
+
     const stateName = (uf) => {
         const item = states.find(([code]) => code === uf);
         return item ? item[1] : uf;
@@ -52,7 +54,7 @@
                 option.value = item[0];
                 if (withLabels) option.label = item[1];
             } else {
-                option.value = item;
+                option.value = upper(item);
             }
             list.appendChild(option);
         });
@@ -67,9 +69,9 @@
             const response = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios?orderBy=nome`);
             if (!response.ok) throw new Error("IBGE indisponivel");
             const data = await response.json();
-            cityCache[uf] = data.map((city) => city.nome);
+            cityCache[uf] = data.map((city) => upper(city.nome));
         } catch (error) {
-            cityCache[uf] = fallbackCities[uf] || [];
+            cityCache[uf] = (fallbackCities[uf] || []).map(upper);
         }
         return cityCache[uf];
     };
@@ -77,6 +79,29 @@
     const relatedField = (field, name) => {
         const form = field.closest("form");
         return form?.querySelector(`[name="${name}"]`) || document.querySelector(`[name="${name}"]`);
+    };
+
+    const renderNeighborhoodButtons = (field, suggestions) => {
+        if (!field) return;
+        const wrapper = field.closest(".form-field") || field.parentElement;
+        if (!wrapper) return;
+        wrapper.querySelector(".location-suggestion-list")?.remove();
+        if (!suggestions.length) return;
+        const list = document.createElement("div");
+        list.className = "location-suggestion-list";
+        suggestions.slice(0, 12).forEach((item) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "location-suggestion";
+            button.textContent = upper(item);
+            button.addEventListener("click", () => {
+                field.value = upper(item);
+                field.dispatchEvent(new Event("input", { bubbles: true }));
+                field.dispatchEvent(new Event("change", { bubbles: true }));
+            });
+            list.appendChild(button);
+        });
+        wrapper.appendChild(list);
     };
 
     const updateNeighborhoods = (field) => {
@@ -89,7 +114,8 @@
         fillDatalist("brazil-neighborhoods-list", suggestions);
         if (neighborhoodField) {
             neighborhoodField.setAttribute("list", "brazil-neighborhoods-list");
-            neighborhoodField.placeholder = suggestions.length ? "Selecione ou digite o bairro" : "Digite o bairro";
+            neighborhoodField.placeholder = suggestions.length ? "SELECIONE OU DIGITE O BAIRRO" : "DIGITE O BAIRRO";
+            renderNeighborhoodButtons(neighborhoodField, suggestions);
         }
     };
 
@@ -124,18 +150,30 @@
         document.querySelectorAll('input[name="city"]').forEach((field) => {
             field.setAttribute("list", "brazil-cities-list");
             field.autocomplete = "address-level2";
+            if (field.value) field.value = upper(field.value);
             field.addEventListener("focus", () => {
                 const stateField = relatedField(field, "state");
                 if (stateField) updateCities(stateField);
             });
-            field.addEventListener("input", () => updateNeighborhoods(field));
-            field.addEventListener("change", () => updateNeighborhoods(field));
+            field.addEventListener("input", () => {
+                field.value = upper(field.value);
+                updateNeighborhoods(field);
+            });
+            field.addEventListener("change", () => {
+                field.value = upper(field.value);
+                updateNeighborhoods(field);
+                relatedField(field, "neighborhood")?.focus();
+            });
             if (field.value) updateNeighborhoods(field);
         });
 
         document.querySelectorAll('input[name="neighborhood"]').forEach((field) => {
             field.setAttribute("list", "brazil-neighborhoods-list");
             field.autocomplete = "address-level3";
+            if (field.value) field.value = upper(field.value);
+            field.addEventListener("input", () => {
+                field.value = upper(field.value);
+            });
             field.addEventListener("focus", () => updateNeighborhoods(field));
             if (field.value) updateNeighborhoods(field);
         });
