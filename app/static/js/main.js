@@ -67,17 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    document.querySelectorAll("[data-uniform-color-target]").forEach((picker) => {
-        const target = document.querySelector(`input[name='${picker.dataset.uniformColorTarget}']`);
-        if (!target) return;
-        picker.addEventListener("input", () => {
-            target.value = picker.value.toLocaleUpperCase("pt-BR");
-        });
-        picker.addEventListener("change", () => {
-            target.value = picker.value.toLocaleUpperCase("pt-BR");
-        });
-    });
-
     document.querySelectorAll("[data-achievement-overlay]").forEach((overlay) => {
         const close = () => {
             overlay.classList.add("closing");

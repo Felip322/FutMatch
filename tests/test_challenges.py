@@ -32,12 +32,9 @@ def test_friendly_post_model_persists():
 
 def test_build_uniform_description_uses_full_uniform_parts():
     uniform = build_uniform_description({
-        "shirt_color": "verde",
         "shirt_color_hex": "#22c55e",
-        "shorts_color": "preto",
         "shorts_color_hex": "#111827",
-        "socks_color": "branco",
         "socks_color_hex": "#ffffff",
     })
 
-    assert uniform == "Camisa: verde (#22C55E) / Calção: preto (#111827) / Meião: branco (#FFFFFF)"
+    assert uniform == "Camisa: #22C55E / Calção: #111827 / Meião: #FFFFFF"
