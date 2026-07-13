@@ -37,7 +37,10 @@
         .trim()
         .toUpperCase();
 
-    const upper = (value) => (value || "").trim().toLocaleUpperCase("pt-BR");
+    const upper = (value, trim = false) => {
+        const text = value || "";
+        return (trim ? text.trim() : text).toLocaleUpperCase("pt-BR");
+    };
 
     const stateName = (uf) => {
         const item = states.find(([code]) => code === uf);
@@ -54,7 +57,7 @@
                 option.value = item[0];
                 if (withLabels) option.label = item[1];
             } else {
-                option.value = upper(item);
+                option.value = upper(item, true);
             }
             list.appendChild(option);
         });
@@ -69,9 +72,9 @@
             const response = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios?orderBy=nome`);
             if (!response.ok) throw new Error("IBGE indisponivel");
             const data = await response.json();
-            cityCache[uf] = data.map((city) => upper(city.nome));
+            cityCache[uf] = data.map((city) => upper(city.nome, true));
         } catch (error) {
-            cityCache[uf] = (fallbackCities[uf] || []).map(upper);
+            cityCache[uf] = (fallbackCities[uf] || []).map((city) => upper(city, true));
         }
         return cityCache[uf];
     };
@@ -93,9 +96,9 @@
             const button = document.createElement("button");
             button.type = "button";
             button.className = "location-suggestion";
-            button.textContent = upper(item);
+            button.textContent = upper(item, true);
             button.addEventListener("click", () => {
-                field.value = upper(item);
+                field.value = upper(item, true);
                 field.dispatchEvent(new Event("input", { bubbles: true }));
                 field.dispatchEvent(new Event("change", { bubbles: true }));
             });
@@ -138,7 +141,7 @@
         document.querySelectorAll('input[name="state"]').forEach((field) => {
             field.setAttribute("list", "brazil-states-list");
             field.setAttribute("maxlength", "2");
-            field.placeholder = "SP";
+            field.removeAttribute("placeholder");
             field.autocomplete = "address-level1";
             field.addEventListener("input", () => {
                 field.value = normalize(field.value).slice(0, 2);
@@ -160,7 +163,7 @@
                 updateNeighborhoods(field);
             });
             field.addEventListener("change", () => {
-                field.value = upper(field.value);
+                field.value = upper(field.value, true);
                 updateNeighborhoods(field);
                 relatedField(field, "neighborhood")?.focus();
             });

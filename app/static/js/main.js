@@ -6,10 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return true;
     };
 
-    const uppercaseField = (field) => {
+    const uppercaseField = (field, trim = false) => {
         const start = field.selectionStart;
         const end = field.selectionEnd;
-        field.value = field.value.toLocaleUpperCase("pt-BR");
+        const value = trim ? field.value.trim() : field.value;
+        field.value = value.toLocaleUpperCase("pt-BR");
         if (typeof start === "number" && typeof end === "number") {
             field.setSelectionRange(start, end);
         }
@@ -26,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener("submit", () => {
             if (form.classList.contains("ajax-like") || form.classList.contains("ajax-comment")) return;
             form.querySelectorAll("input, textarea").forEach((field) => {
-                if (shouldUppercase(field)) uppercaseField(field);
+                if (shouldUppercase(field)) uppercaseField(field, true);
             });
             const button = form.querySelector("button[type='submit'], input[type='submit']");
             if (button) setTimeout(() => button.setAttribute("disabled", "disabled"), 0);
