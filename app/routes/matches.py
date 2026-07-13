@@ -12,11 +12,31 @@ from app.utils.file_upload import save_upload
 matches_bp = Blueprint("matches", __name__)
 
 
+def owned_team_ids():
+    return [team.id for team in Team.query.filter_by(owner_id=current_user.id)]
+
+
+def can_access_match(match):
+    if current_user.is_admin:
+        return True
+    team_ids = owned_team_ids()
+    return match.home_team_id in team_ids or match.away_team_id in team_ids
+
+
+def visible_matches_query():
+    query = Match.query
+    if current_user.is_admin:
+        return query
+    team_ids = owned_team_ids()
+    if not team_ids:
+        return query.filter(False)
+    return query.filter((Match.home_team_id.in_(team_ids)) | (Match.away_team_id.in_(team_ids)))
+
+
 @matches_bp.route("/matches")
 @login_required
 def list_matches():
-    team_ids = [team.id for team in Team.query.filter_by(owner_id=current_user.id)]
-    matches = Match.query.filter((Match.home_team_id.in_(team_ids)) | (Match.away_team_id.in_(team_ids))).order_by(Match.match_date).all() if team_ids else Match.query.limit(20).all()
+    matches = visible_matches_query().order_by(Match.match_date).all()
     return render_template("matches/list.html", matches=matches)
 
 
@@ -24,6 +44,8 @@ def list_matches():
 @login_required
 def detail(id):
     match = Match.query.get_or_404(id)
+    if not can_access_match(match):
+        return render_template("errors/403.html"), 403
     return render_template("matches/detail.html", match=match)
 
 
@@ -31,12 +53,12 @@ def detail(id):
 @login_required
 def confirm_result(id):
     match = Match.query.get_or_404(id)
-    owned_team_ids = [team.id for team in Team.query.filter_by(owner_id=current_user.id)]
-    if not current_user.is_admin and match.home_team_id not in owned_team_ids and match.away_team_id not in owned_team_ids:
+    team_ids = owned_team_ids()
+    if not current_user.is_admin and match.home_team_id not in team_ids and match.away_team_id not in team_ids:
         return render_template("errors/403.html"), 403
     if request.method == "POST":
         happened = request.form.get("happened") == "yes"
-        team_id = match.home_team_id if match.home_team_id in owned_team_ids else match.away_team_id
+        team_id = match.home_team_id if match.home_team_id in team_ids else match.away_team_id
         if current_user.is_admin and request.form.get("team_id"):
             team_id = int(request.form["team_id"])
         existing = MatchResultConfirmation.query.filter_by(match_id=match.id, team_id=team_id).first()
@@ -117,13 +139,13 @@ def confirm_result(id):
 @login_required
 def simple_review(id):
     match = Match.query.get_or_404(id)
-    owned_team_ids = [team.id for team in Team.query.filter_by(owner_id=current_user.id)]
+    team_ids = owned_team_ids()
     if match.status != "Finalizado":
         flash("Avaliacoes ficam disponiveis apos o resultado final.", "warning")
         return redirect(url_for("matches.detail", id=id))
-    if not current_user.is_admin and match.home_team_id not in owned_team_ids and match.away_team_id not in owned_team_ids:
+    if not current_user.is_admin and match.home_team_id not in team_ids and match.away_team_id not in team_ids:
         return render_template("errors/403.html"), 403
-    reviewer_team_id = match.home_team_id if match.home_team_id in owned_team_ids else match.away_team_id
+    reviewer_team_id = match.home_team_id if match.home_team_id in team_ids else match.away_team_id
     reviewed_team_id = match.away_team_id if reviewer_team_id == match.home_team_id else match.home_team_id
     if request.method == "POST":
         existing = SimpleFairPlayReview.query.filter_by(match_id=match.id, reviewer_team_id=reviewer_team_id, reviewed_team_id=reviewed_team_id).first()
@@ -155,7 +177,7 @@ def simple_review(id):
 @matches_bp.route("/matches/pending-results")
 @login_required
 def pending_results():
-    team_ids = [team.id for team in Team.query.filter_by(owner_id=current_user.id)]
+    team_ids = owned_team_ids()
     query = Match.query.filter(Match.match_date <= date.today(), Match.home_score.is_(None), Match.away_score.is_(None))
     if not current_user.is_admin:
         query = query.filter((Match.home_team_id.in_(team_ids)) | (Match.away_team_id.in_(team_ids)))

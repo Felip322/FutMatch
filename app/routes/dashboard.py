@@ -65,7 +65,13 @@ def dashboard():
             "date": post.created_at,
             "link": url_for("challenges.friendly_detail", id=post.id),
         })
-    for match in Match.query.filter_by(result_status="Confirmado").order_by(Match.created_at.desc()).limit(4).all():
+    confirmed_scores_query = Match.query.filter_by(result_status="Confirmado")
+    if not current_user.is_admin:
+        if team_ids:
+            confirmed_scores_query = confirmed_scores_query.filter((Match.home_team_id.in_(team_ids)) | (Match.away_team_id.in_(team_ids)))
+        else:
+            confirmed_scores_query = confirmed_scores_query.filter(False)
+    for match in confirmed_scores_query.order_by(Match.created_at.desc()).limit(4).all():
         activity_items.append({
             "kind": "score",
             "icon": "bi-trophy",
