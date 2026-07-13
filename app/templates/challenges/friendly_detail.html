@@ -32,7 +32,18 @@
         <div class="info-list">
             <p><i class="bi bi-people"></i><span>{{ post.players_count }}x{{ post.players_count }}</span></p>
             <p><i class="bi bi-stopwatch"></i><span>{{ post.duration_minutes }} min, tolerancia {{ post.tolerance_minutes }} min</span></p>
-            <p><i class="bi bi-shirt"></i><span>{{ post.uniform or "Uniforme a combinar" }}</span></p>
+            <div class="info-list-row">
+                <i class="bi bi-shirt"></i>
+                {% if post.uniform_parts %}
+                <div class="uniform-swatch-list">
+                    {% for part in post.uniform_parts %}
+                    <span class="uniform-swatch" title="{{ part.label }}: {{ part.color }}"><i style="background: {{ part.color }}"></i>{{ part.label }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <span>Uniforme a combinar</span>
+                {% endif %}
+            </div>
         </div>
         <p class="muted">{{ post.rules or "Regras padrao de futsal." }}</p>
         <p class="muted">{{ post.notes or "Sem observacoes adicionais." }}</p>
@@ -53,10 +64,28 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <label class="check"><input type="checkbox" name="confirms_time" checked><span>Confirmamos o horário</span></label>
             <label class="check"><input type="checkbox" name="accepts_location" checked><span>Aceitamos o local</span></label>
-            <label class="form-field"><span>Uniforme do nosso time</span><input class="input" name="uniform_color" placeholder="Ex: camisa azul, calção branco e meião azul"></label>
+            <div class="form-grid three">
+                <label class="form-field uniform-color-field">
+                    <span>Cor da camisa</span>
+                    <span class="uniform-color-control">
+                        <input class="uniform-color-picker" type="color" name="shirt_color_hex" value="#2563eb" aria-label="Selecionar cor da camisa">
+                    </span>
+                </label>
+                <label class="form-field uniform-color-field">
+                    <span>Cor do calção</span>
+                    <span class="uniform-color-control">
+                        <input class="uniform-color-picker" type="color" name="shorts_color_hex" value="#ffffff" aria-label="Selecionar cor do calção">
+                    </span>
+                </label>
+                <label class="form-field uniform-color-field">
+                    <span>Cor do meião</span>
+                    <span class="uniform-color-control">
+                        <input class="uniform-color-picker" type="color" name="socks_color_hex" value="#2563eb" aria-label="Selecionar cor do meião">
+                    </span>
+                </label>
+            </div>
             <div class="preset-messages">
                 <button type="button" class="btn ghost" data-message-preset="Confirmamos horário e local. Vamos informar o uniforme do nosso time.">Horário + local</button>
-                <button type="button" class="btn ghost" data-message-preset="Nosso uniforme será camisa azul, calção branco e meião azul.">Uniforme completo</button>
                 <button type="button" class="btn ghost" data-message-preset="Podemos chegar 15 minutos antes e respeitamos as regras combinadas.">Chegada antecipada</button>
             </div>
             <label class="form-field"><span>Observação opcional</span><textarea class="input" name="message" id="request-message" placeholder="Ex: Nosso time confirma esse horário."></textarea></label>
@@ -77,7 +106,16 @@
             <div class="inbox-avatar">{{ item.requester_team.short_name or item.requester_team.name[:2] }}</div>
             <div>
                 <strong>{{ item.requester_team.name }}</strong>
-                <small>{{ item.status }} - horário {{ "ok" if item.confirms_time else "não confirmado" }} - local {{ "ok" if item.accepts_location else "não confirmado" }} - uniforme {{ item.uniform_color or "-" }}</small>
+                <small>{{ item.status }} - horário {{ "ok" if item.confirms_time else "não confirmado" }} - local {{ "ok" if item.accepts_location else "não confirmado" }}</small>
+                {% if item.uniform_parts %}
+                <div class="uniform-swatch-list compact">
+                    {% for part in item.uniform_parts %}
+                    <span class="uniform-swatch" title="{{ part.label }}: {{ part.color }}"><i style="background: {{ part.color }}"></i>{{ part.label }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <small>Uniforme não informado</small>
+                {% endif %}
                 {% if item.message %}<p>{{ item.message }}</p>{% endif %}
                 {% if (post.team.owner_id == current_user.id or current_user.is_admin) and item.status == "Pendente" and post.status in ["Aberto", "Com solicitacoes"] %}
                 <div class="actions-inline">

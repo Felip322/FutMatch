@@ -74,6 +74,23 @@ def build_uniform_description(form):
     return description or form.get("uniform")
 
 
+def parse_uniform_description(description):
+    if not description:
+        return []
+    parts = []
+    for raw_piece in description.split(" / "):
+        if ":" not in raw_piece:
+            continue
+        label, value = raw_piece.split(":", 1)
+        color = value.strip()
+        hash_position = color.find("#")
+        if hash_position >= 0:
+            color = color[hash_position:hash_position + 7].upper()
+        if color.startswith("#") and len(color) == 7:
+            parts.append({"label": label.strip(), "color": color})
+    return parts
+
+
 @challenges_bp.route("/opponents")
 @login_required
 def opponents():
@@ -178,6 +195,9 @@ def friendly_detail(id):
     post = FriendlyMatchPost.query.get_or_404(id)
     team = current_team()
     existing_request = FriendlyMatchRequest.query.filter_by(post_id=post.id, requester_team_id=team.id).first() if team else None
+    post.uniform_parts = parse_uniform_description(post.uniform)
+    for item in post.requests:
+        item.uniform_parts = parse_uniform_description(item.uniform_color)
     return render_template("challenges/friendly_detail.html", post=post, team=team, existing_request=existing_request)
 
 
@@ -202,7 +222,7 @@ def request_friendly(id):
         message=request.form.get("message"),
         confirms_time=bool(request.form.get("confirms_time")),
         accepts_location=bool(request.form.get("accepts_location")),
-        uniform_color=request.form.get("uniform_color"),
+        uniform_color=build_uniform_description(request.form),
     )
     db.session.add(friendly_request)
     if post.status == "Aberto":
@@ -290,4 +310,7 @@ def cancel_friendly(id):
 def friendly_receipt(id):
     post = FriendlyMatchPost.query.get_or_404(id)
     accepted_request = FriendlyMatchRequest.query.get(post.accepted_request_id) if post.accepted_request_id else None
+    post.uniform_parts = parse_uniform_description(post.uniform)
+    if accepted_request:
+        accepted_request.uniform_parts = parse_uniform_description(accepted_request.uniform_color)
     return render_template("challenges/friendly_receipt.html", post=post, accepted_request=accepted_request)

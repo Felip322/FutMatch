@@ -10,7 +10,18 @@
     <p><strong>Local:</strong> {{ post.location_name }}{% if post.court %} (quadra cadastrada){% endif %} - {{ post.address }}{% if post.court and post.court.address_number %}, {{ post.court.address_number }}{% endif %}</p>
     <p><strong>Responsaveis:</strong> {{ post.team.owner.display_name }}{% if accepted_request %} e {{ accepted_request.requester_team.owner.display_name }}{% endif %}</p>
     <p><strong>Formato:</strong> {{ post.players_count }}x{{ post.players_count }}, {{ post.duration_minutes }} min, tolerancia {{ post.tolerance_minutes }} min</p>
-    <p><strong>Uniforme:</strong> {{ post.uniform or "A combinar" }}</p>
+    <div class="receipt-uniform">
+        <strong>Uniforme:</strong>
+        {% if post.uniform_parts %}
+        <div class="uniform-swatch-list">
+            {% for part in post.uniform_parts %}
+            <span class="uniform-swatch" title="{{ part.label }}: {{ part.color }}"><i style="background: {{ part.color }}"></i>{{ part.label }}</span>
+            {% endfor %}
+        </div>
+        {% else %}
+        <span>A combinar</span>
+        {% endif %}
+    </div>
     <p><strong>Regras:</strong> {{ post.rules or "Regras padrao de futsal." }}</p>
 </section>
 {% endblock %}

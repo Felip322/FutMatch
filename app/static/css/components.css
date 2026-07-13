@@ -182,6 +182,13 @@ td, th { text-align: left; padding: 12px; border-bottom: 1px solid var(--border)
 .info-list { display: grid; gap: 10px; margin: 12px 0; }
 .info-list p { display: flex; align-items: flex-start; gap: 10px; margin: 0; color: var(--text-secondary); }
 .info-list i { color: var(--accent); margin-top: 2px; }
+.info-list-row { display: flex; align-items: flex-start; gap: 10px; color: var(--text-secondary); }
+.info-list-row > i { color: var(--accent); margin-top: 4px; }
+.uniform-swatch-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.uniform-swatch-list.compact { margin-top: 8px; }
+.uniform-swatch { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.045); color: var(--text-secondary); font-size: .82rem; font-weight: 800; }
+.uniform-swatch i { width: 18px; height: 18px; margin: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,.45); box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+.receipt-uniform { display: grid; gap: 8px; margin: 12px 0; color: var(--text-secondary); }
 .request-form { display: grid; gap: 8px; }
 .request-row { display: grid; grid-template-columns: 42px 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
 .request-row small { display: block; margin-top: 4px; color: var(--text-secondary); }

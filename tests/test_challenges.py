@@ -3,7 +3,7 @@ from datetime import date, time
 from app import create_app
 from app.extensions import db
 from app.models import FriendlyMatchPost, Team, User
-from app.routes.challenges import build_uniform_description
+from app.routes.challenges import build_uniform_description, parse_uniform_description
 from config import TestConfig
 
 
@@ -38,3 +38,13 @@ def test_build_uniform_description_uses_full_uniform_parts():
     })
 
     assert uniform == "Camisa: #22C55E / Calção: #111827 / Meião: #FFFFFF"
+
+
+def test_parse_uniform_description_returns_visual_parts():
+    parts = parse_uniform_description("Camisa: #22C55E / Calção: #111827 / Meião: #FFFFFF")
+
+    assert parts == [
+        {"label": "Camisa", "color": "#22C55E"},
+        {"label": "Calção", "color": "#111827"},
+        {"label": "Meião", "color": "#FFFFFF"},
+    ]
