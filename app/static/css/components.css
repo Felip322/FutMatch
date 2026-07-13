@@ -108,6 +108,7 @@ textarea.input { min-height: 110px; resize: vertical; }
 .match-club-panel.away { text-align: right; justify-items: end; }
 .match-club-panel > span { color: var(--text-secondary); font-size: .76rem; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
 .match-club-panel > strong { color: var(--text-primary); font: 900 clamp(1.55rem, 3.4vw, 3rem)/1 var(--font-heading); overflow-wrap: anywhere; }
+.match-club-logo { width: min(132px, 42vw); height: 96px; object-fit: contain; border-radius: 16px; padding: 8px; background: rgba(4,10,20,.35); border: 1px solid var(--border); }
 .match-score-panel { display: grid; place-items: center; align-content: center; min-width: 160px; min-height: 154px; padding: 20px; border-radius: var(--radius); background: rgba(4,10,20,.66); border: 1px solid rgba(183,255,42,.22); }
 .match-score-panel small, .match-score-panel span { color: var(--text-secondary); font-weight: 900; text-transform: uppercase; }
 .match-score-panel .scoreboard { line-height: 1; }
