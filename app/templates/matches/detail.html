@@ -14,28 +14,20 @@
         <div class="team-uniform-row">
             <strong>Mandante:</strong>
             <span>{{ match.home_team.name }}</span>
-            {% if match.home_uniform_parts %}
-            <div class="uniform-dot-list" aria-label="Uniforme do mandante">
-                {% for part in match.home_uniform_parts %}
-                <i title="{{ part.label }}: {{ part.color }}" style="background: {{ part.color }}"></i>
-                {% endfor %}
+            <div class="uniform-kit-list" aria-label="Uniforme do mandante">
+                <i class="uniform-kit-box {{ 'missing' if match.home_uniform_parts|length == 0 else '' }}" title="Camisa{% if match.home_uniform_parts|length > 0 %}: {{ match.home_uniform_parts[0].color }}{% endif %}" {% if match.home_uniform_parts|length > 0 %}style="background: {{ match.home_uniform_parts[0].color }}"{% endif %}><span>C</span></i>
+                <i class="uniform-kit-box {{ 'missing' if match.home_uniform_parts|length < 2 else '' }}" title="Shorts{% if match.home_uniform_parts|length > 1 %}: {{ match.home_uniform_parts[1].color }}{% endif %}" {% if match.home_uniform_parts|length > 1 %}style="background: {{ match.home_uniform_parts[1].color }}"{% endif %}><span>S</span></i>
+                <i class="uniform-kit-box {{ 'missing' if match.home_uniform_parts|length < 3 else '' }}" title="Meião{% if match.home_uniform_parts|length > 2 %}: {{ match.home_uniform_parts[2].color }}{% endif %}" {% if match.home_uniform_parts|length > 2 %}style="background: {{ match.home_uniform_parts[2].color }}"{% endif %}><span>M</span></i>
             </div>
-            {% else %}
-            <small>uniforme não informado</small>
-            {% endif %}
         </div>
         <div class="team-uniform-row">
             <strong>Visitante:</strong>
             <span>{{ match.away_team.name }}</span>
-            {% if match.away_uniform_parts %}
-            <div class="uniform-dot-list" aria-label="Uniforme do visitante">
-                {% for part in match.away_uniform_parts %}
-                <i title="{{ part.label }}: {{ part.color }}" style="background: {{ part.color }}"></i>
-                {% endfor %}
+            <div class="uniform-kit-list" aria-label="Uniforme do visitante">
+                <i class="uniform-kit-box {{ 'missing' if match.away_uniform_parts|length == 0 else '' }}" title="Camisa{% if match.away_uniform_parts|length > 0 %}: {{ match.away_uniform_parts[0].color }}{% endif %}" {% if match.away_uniform_parts|length > 0 %}style="background: {{ match.away_uniform_parts[0].color }}"{% endif %}><span>C</span></i>
+                <i class="uniform-kit-box {{ 'missing' if match.away_uniform_parts|length < 2 else '' }}" title="Shorts{% if match.away_uniform_parts|length > 1 %}: {{ match.away_uniform_parts[1].color }}{% endif %}" {% if match.away_uniform_parts|length > 1 %}style="background: {{ match.away_uniform_parts[1].color }}"{% endif %}><span>S</span></i>
+                <i class="uniform-kit-box {{ 'missing' if match.away_uniform_parts|length < 3 else '' }}" title="Meião{% if match.away_uniform_parts|length > 2 %}: {{ match.away_uniform_parts[2].color }}{% endif %}" {% if match.away_uniform_parts|length > 2 %}style="background: {{ match.away_uniform_parts[2].color }}"{% endif %}><span>M</span></i>
             </div>
-            {% else %}
-            <small>uniforme não informado</small>
-            {% endif %}
         </div>
         <p><strong>Status:</strong> {{ match.status }}</p>
         <p><strong>Resultado:</strong> {{ match.result_status }}</p>

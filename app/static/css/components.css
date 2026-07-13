@@ -194,8 +194,10 @@ td, th { text-align: left; padding: 12px; border-bottom: 1px solid var(--border)
 .team-uniform-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 12px 0; color: var(--text-secondary); }
 .team-uniform-row strong { color: var(--text-secondary); }
 .team-uniform-row small { color: var(--text-secondary); }
-.uniform-dot-list { display: inline-flex; align-items: center; gap: 5px; }
-.uniform-dot-list i { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(255,255,255,.5); box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+.uniform-kit-list { display: inline-flex; align-items: center; gap: 6px; }
+.uniform-kit-box { position: relative; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(255,255,255,.46); box-shadow: inset 0 0 0 1px rgba(0,0,0,.2); font-style: normal; }
+.uniform-kit-box.missing { background: rgba(255,255,255,.08); border-color: var(--border); }
+.uniform-kit-box span { display: grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; background: rgba(7,17,31,.76); color: #fff; font-size: .62rem; font-weight: 900; line-height: 1; }
 .cancel-match-card { display: grid; grid-template-columns: minmax(0, .7fr) minmax(320px, 1fr); gap: 18px; align-items: start; margin-top: 22px; border-color: rgba(255,77,94,.26); }
 .cancel-match-form { display: grid; gap: 10px; }
 .cancel-match-form .form-field { margin-bottom: 0; }
