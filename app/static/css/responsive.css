@@ -29,7 +29,7 @@
     .toast-stack { left: 12px; right: 12px; top: 74px; }
     .friendly-card { grid-template-columns: 1fr; }
     .team-mini-profile { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .date-tile { height: auto; min-height: 70px; grid-template-columns: auto auto; gap: 8px; }
+    .date-tile { width: 100%; height: auto; min-height: 70px; grid-template-columns: auto auto; gap: 8px; }
     .sticky-filter { top: 66px; }
     .form-footer { flex-direction: column-reverse; }
     .onboarding-strip { grid-template-columns: 1fr; }
