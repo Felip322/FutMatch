@@ -3,7 +3,7 @@
     .app-authenticated .page-shell { width: min(100% - 32px, 1180px); margin: 0 auto; }
     .hero, .split-layout, .card-grid.two, .dashboard-main, .detail-grid, .search-grid, .admin-action-grid, .friendly-detail-hero, .feed-layout, .gamification-grid, .ranking-story-grid, .notification-center { grid-template-columns: 1fr; }
     .steps, .dashboard-grid, .stats-band { grid-template-columns: repeat(2, 1fr); }
-    .form-grid, .form-grid.two, .form-grid.three, .check-grid { grid-template-columns: 1fr; }
+    .form-grid, .form-grid.two, .form-grid.three, .check-grid, .media-edit-grid { grid-template-columns: 1fr; }
     .page-heading { align-items: flex-start; flex-direction: column; }
     .team-profile-row { align-items: flex-start; flex-direction: column; }
     .podium-grid { grid-template-columns: 1fr; }

@@ -92,13 +92,13 @@ def create_team():
             team.banner_image = save_upload(request.files.get("banner_image"), "teams") or team.banner_image
         except ValueError as exc:
             flash(str(exc), "danger")
-            return render_template("teams/form.html", form=form, title="Criar equipe")
+            return render_template("teams/form.html", form=form, title="Criar equipe", team=None)
         db.session.add(team)
         db.session.commit()
         award_team_badges(team)
         flash("Equipe criada.", "success")
         return redirect(url_for("teams.detail", slug=team.slug))
-    return render_template("teams/form.html", form=form, title="Criar equipe")
+    return render_template("teams/form.html", form=form, title="Criar equipe", team=None)
 
 
 @teams_bp.route("/teams/<slug>")
@@ -271,9 +271,9 @@ def edit_team(slug):
             team.banner_image = save_upload(request.files.get("banner_image"), "teams") or team.banner_image
         except ValueError as exc:
             flash(str(exc), "danger")
-            return render_template("teams/form.html", form=form, title="Editar equipe")
+            return render_template("teams/form.html", form=form, title="Editar equipe", team=team)
         db.session.commit()
         award_team_badges(team)
         flash("Equipe atualizada.", "success")
         return redirect(url_for("teams.detail", slug=team.slug))
-    return render_template("teams/form.html", form=form, title="Editar equipe")
+    return render_template("teams/form.html", form=form, title="Editar equipe", team=team)

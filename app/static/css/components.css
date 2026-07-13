@@ -198,6 +198,13 @@ td, th { text-align: left; padding: 12px; border-bottom: 1px solid var(--border)
 .mini-social-post small { color: var(--text-secondary); }
 .team-logo-img, .court-cover-thumb { width: 92px; height: 92px; object-fit: cover; border-radius: 20px; border: 6px solid var(--card-bg); box-shadow: var(--shadow); background: var(--card-bg); }
 .court-cover-thumb { border-radius: var(--radius); border-width: 1px; }
+.media-edit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.media-edit-card { align-content: start; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius); background: rgba(255,255,255,.03); }
+.media-edit-preview, .media-edit-placeholder { width: 100%; border-radius: var(--radius); border: 1px solid var(--border); background: rgba(4,10,20,.55); }
+.media-edit-preview { object-fit: cover; }
+.logo-preview { width: 112px; height: 112px; border-radius: 22px; }
+.banner-preview, .banner-placeholder { aspect-ratio: 16 / 6; min-height: 132px; }
+.media-edit-placeholder { display: grid; place-items: center; min-height: 112px; color: var(--text-secondary); font-weight: 900; }
 .proof-image { width: 100%; max-height: 260px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--border); margin: 8px 0 14px; }
 .reputation-list { display: grid; gap: 8px; padding: 0; margin: 12px 0 0; list-style: none; }
 .reputation-list li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); color: var(--text-secondary); }

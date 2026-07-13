@@ -14,6 +14,9 @@
             {% if current_user.is_authenticated and current_user.id == team.owner_id %}
             <a class="btn accent" href="{{ url_for('challenges.create_friendly') }}"><i class="bi bi-calendar-plus"></i>Publicar amistoso</a>
             <a class="btn ghost" href="{{ url_for('teams.agenda', slug=team.slug) }}"><i class="bi bi-calendar3"></i>Agenda</a>
+            <a class="btn ghost" href="{{ url_for('teams.edit_team', slug=team.slug) }}"><i class="bi bi-pencil-square"></i>Editar perfil</a>
+            {% elif current_user.is_authenticated and current_user.is_admin %}
+            <a class="btn ghost" href="{{ url_for('teams.edit_team', slug=team.slug) }}"><i class="bi bi-pencil-square"></i>Editar perfil</a>
             {% else %}
             <a class="btn accent" href="{{ url_for('teams.invite', slug=team.slug) }}"><i class="bi bi-send"></i>Convidar para amistoso</a>
             <a class="btn ghost" href="{{ url_for('teams.public_detail', slug=team.slug) }}"><i class="bi bi-share"></i>Perfil público</a>
