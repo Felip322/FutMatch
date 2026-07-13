@@ -2,13 +2,8 @@
 {% block content %}
 {% set post = match.friendly_post %}
 <section class="match-room match-room-pro">
-    <div class="match-room-main">
+    <div class="match-room-header">
         <span class="status-badge status-{{ 'confirmed' if match.status == 'Confirmado' else 'cancelled' if match.status == 'Cancelado' else 'done' if match.status == 'Finalizado' else 'review' if match.status == 'Em revisao' else 'neutral' }}">{{ match.status }}</span>
-        <div class="match-room-teams">
-            <span>{{ match.home_team.name }}</span>
-            <strong>x</strong>
-            <span>{{ match.away_team.name }}</span>
-        </div>
         <div class="match-room-meta">
             <span><i class="bi bi-calendar-event"></i>{{ match.match_date.strftime("%d/%m/%Y") }} às {{ match.start_time.strftime("%H:%M") }}</span>
             {% if post %}
@@ -18,17 +13,37 @@
             {% endif %}
         </div>
     </div>
-    <div class="match-score-panel">
-        <small>Placar</small>
-        <div class="scoreboard">{{ match.home_score if match.home_score is not none else "-" }} x {{ match.away_score if match.away_score is not none else "-" }}</div>
-        <span>{{ match.result_status }}</span>
+    <div class="match-versus-board">
+        <div class="match-club-panel">
+            <span>Mandante</span>
+            <strong>{{ match.home_team.name }}</strong>
+            <div class="uniform-kit-list" aria-label="Uniforme do mandante">
+                <i class="uniform-kit-box {{ 'missing' if match.home_uniform_parts|length == 0 else '' }}" title="{% if match.home_uniform_parts|length > 0 %}Camisa: {{ match.home_uniform_parts[0].color }}{% else %}Camisa não informada{% endif %}" {% if match.home_uniform_parts|length > 0 %}style="background: {{ match.home_uniform_parts[0].color }}"{% endif %}><span>C</span></i>
+                <i class="uniform-kit-box {{ 'missing' if match.home_uniform_parts|length < 2 else '' }}" title="{% if match.home_uniform_parts|length > 1 %}Shorts: {{ match.home_uniform_parts[1].color }}{% else %}Shorts não informado{% endif %}" {% if match.home_uniform_parts|length > 1 %}style="background: {{ match.home_uniform_parts[1].color }}"{% endif %}><span>S</span></i>
+                <i class="uniform-kit-box {{ 'missing' if match.home_uniform_parts|length < 3 else '' }}" title="{% if match.home_uniform_parts|length > 2 %}Meião: {{ match.home_uniform_parts[2].color }}{% else %}Meião não informado{% endif %}" {% if match.home_uniform_parts|length > 2 %}style="background: {{ match.home_uniform_parts[2].color }}"{% endif %}><span>M</span></i>
+            </div>
+        </div>
+        <div class="match-score-panel">
+            <small>Placar</small>
+            <div class="scoreboard">{{ match.home_score if match.home_score is not none else "-" }} x {{ match.away_score if match.away_score is not none else "-" }}</div>
+            <span>{{ match.result_status }}</span>
+        </div>
+        <div class="match-club-panel away">
+            <span>Visitante</span>
+            <strong>{{ match.away_team.name }}</strong>
+            <div class="uniform-kit-list" aria-label="Uniforme do visitante">
+                <i class="uniform-kit-box {{ 'missing' if match.away_uniform_parts|length == 0 else '' }}" title="{% if match.away_uniform_parts|length > 0 %}Camisa: {{ match.away_uniform_parts[0].color }}{% else %}Camisa não informada{% endif %}" {% if match.away_uniform_parts|length > 0 %}style="background: {{ match.away_uniform_parts[0].color }}"{% endif %}><span>C</span></i>
+                <i class="uniform-kit-box {{ 'missing' if match.away_uniform_parts|length < 2 else '' }}" title="{% if match.away_uniform_parts|length > 1 %}Shorts: {{ match.away_uniform_parts[1].color }}{% else %}Shorts não informado{% endif %}" {% if match.away_uniform_parts|length > 1 %}style="background: {{ match.away_uniform_parts[1].color }}"{% endif %}><span>S</span></i>
+                <i class="uniform-kit-box {{ 'missing' if match.away_uniform_parts|length < 3 else '' }}" title="{% if match.away_uniform_parts|length > 2 %}Meião: {{ match.away_uniform_parts[2].color }}{% else %}Meião não informado{% endif %}" {% if match.away_uniform_parts|length > 2 %}style="background: {{ match.away_uniform_parts[2].color }}"{% endif %}><span>M</span></i>
+            </div>
+        </div>
     </div>
 </section>
 
 <section class="match-quick-grid">
     <article class="data-card match-info-card">
         <div class="card-title-row">
-            <h2>Local e horário</h2>
+            <h2><i class="bi bi-geo-alt"></i>Local e horário</h2>
             {% if match.court %}<span class="court-chip"><i class="bi bi-check-circle"></i>Quadra cadastrada</span>{% endif %}
         </div>
         <div class="info-list">
@@ -46,7 +61,7 @@
     </article>
 
     <article class="data-card match-info-card">
-        <h2>Regras combinadas</h2>
+        <h2><i class="bi bi-clipboard-check"></i>Regras combinadas</h2>
         <div class="info-list">
             {% if post %}
             <p><i class="bi bi-people"></i><span>{{ post.players_count }}x{{ post.players_count }}</span></p>
