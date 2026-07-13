@@ -61,12 +61,21 @@ def court_has_conflict(court_id, match_date, start_time, duration_minutes, ignor
 
 
 def build_uniform_description(form):
-    pieces = [
-        ("Camisa", form.get("shirt_color")),
-        ("Calção", form.get("shorts_color")),
-        ("Meião", form.get("socks_color")),
-    ]
-    description = " / ".join(f"{label}: {value.strip()}" for label, value in pieces if value and value.strip())
+    pieces = []
+    for label, text_key, hex_key in [
+        ("Camisa", "shirt_color", "shirt_color_hex"),
+        ("Calção", "shorts_color", "shorts_color_hex"),
+        ("Meião", "socks_color", "socks_color_hex"),
+    ]:
+        color_text = (form.get(text_key) or "").strip()
+        color_hex = (form.get(hex_key) or "").strip().upper()
+        if color_text and color_hex:
+            pieces.append(f"{label}: {color_text} ({color_hex})")
+        elif color_text:
+            pieces.append(f"{label}: {color_text}")
+        elif color_hex:
+            pieces.append(f"{label}: {color_hex}")
+    description = " / ".join(pieces)
     return description or form.get("uniform")
 
 

@@ -44,9 +44,30 @@
         <div class="form-grid three">
             <label class="form-field"><span>Jogadores por time</span><input class="input" type="number" name="players_count" value="5" min="3"></label>
             <label class="form-field"><span>Tolerancia</span><input class="input" type="number" name="tolerance_minutes" value="10" min="0"></label>
-            <label class="form-field"><span>Cor da camisa</span><input class="input" name="shirt_color" placeholder="Ex: verde limão"></label>
-            <label class="form-field"><span>Cor do calção</span><input class="input" name="shorts_color" placeholder="Ex: preto"></label>
-            <label class="form-field"><span>Cor do meião</span><input class="input" name="socks_color" placeholder="Ex: branco"></label>
+            <label class="form-field uniform-color-field">
+                <span>Cor da camisa</span>
+                <span class="uniform-color-control">
+                    <input class="input" name="shirt_color" placeholder="Ex: verde limão">
+                    <input type="hidden" name="shirt_color_hex">
+                    <input class="uniform-color-picker" type="color" value="#22c55e" data-uniform-color-target="shirt_color_hex" aria-label="Selecionar cor da camisa">
+                </span>
+            </label>
+            <label class="form-field uniform-color-field">
+                <span>Cor do calção</span>
+                <span class="uniform-color-control">
+                    <input class="input" name="shorts_color" placeholder="Ex: preto">
+                    <input type="hidden" name="shorts_color_hex">
+                    <input class="uniform-color-picker" type="color" value="#111827" data-uniform-color-target="shorts_color_hex" aria-label="Selecionar cor do calção">
+                </span>
+            </label>
+            <label class="form-field uniform-color-field">
+                <span>Cor do meião</span>
+                <span class="uniform-color-control">
+                    <input class="input" name="socks_color" placeholder="Ex: branco">
+                    <input type="hidden" name="socks_color_hex">
+                    <input class="uniform-color-picker" type="color" value="#ffffff" data-uniform-color-target="socks_color_hex" aria-label="Selecionar cor do meião">
+                </span>
+            </label>
         </div>
         <label class="form-field"><span>Regras do amistoso</span><textarea class="input" name="rules" placeholder="Ex: dois tempos, sem carrinho, goleiro linha liberado"></textarea></label>
         <label class="form-field"><span>Observacoes</span><textarea class="input" name="notes" placeholder="Ex: chegar 15 minutos antes"></textarea></label>

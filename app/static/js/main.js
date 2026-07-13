@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const shouldUppercase = (field) => {
         if (!field.matches("input, textarea")) return false;
-        if (field.type && ["email", "password", "url", "number", "date", "time", "datetime-local", "month", "week", "file", "hidden", "checkbox", "radio", "submit", "button"].includes(field.type)) return false;
+        if (field.type && ["email", "password", "url", "number", "date", "time", "datetime-local", "month", "week", "file", "color", "hidden", "checkbox", "radio", "submit", "button"].includes(field.type)) return false;
         if (field.dataset.keepCase === "true") return false;
         return true;
     };
@@ -64,6 +64,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 small.textContent = "Prévia da nova imagem";
                 card.insertBefore(small, input);
             }
+        });
+    });
+
+    document.querySelectorAll("[data-uniform-color-target]").forEach((picker) => {
+        const target = document.querySelector(`input[name='${picker.dataset.uniformColorTarget}']`);
+        if (!target) return;
+        picker.addEventListener("input", () => {
+            target.value = picker.value.toLocaleUpperCase("pt-BR");
+        });
+        picker.addEventListener("change", () => {
+            target.value = picker.value.toLocaleUpperCase("pt-BR");
         });
     });
 
