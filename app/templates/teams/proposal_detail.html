@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="friendly-detail-hero">
+    <div class="friendly-detail-main">
+        <span class="status-badge status-{{ 'confirmed' if proposal.status == 'Aceita' else 'cancelled' if proposal.status == 'Recusada' else 'requests' }}">{{ proposal.status }}</span>
+        <h1>{{ proposal.proposer_team.name }} propôs amistoso</h1>
+        <p>Contra {{ proposal.target_team.name }} - {{ proposal.match_date.strftime("%d/%m/%Y") }} as {{ proposal.start_time.strftime("%H:%M") }} - {{ proposal.location_name }}</p>
+        {% if proposal.message %}<p>{{ proposal.message }}</p>{% endif %}
+    </div>
+    <div class="match-summary-card">
+        <div class="crest big">{{ proposal.proposer_team.short_name or proposal.proposer_team.name[:2] }}</div>
+        <span>contra</span>
+        <div class="crest big">{{ proposal.target_team.short_name or proposal.target_team.name[:2] }}</div>
+    </div>
+</section>
+<section class="split-layout">
+    <article class="data-card">
+        <h2>Local sugerido</h2>
+        <p>{{ proposal.location_name }}</p>
+        <p>{{ proposal.address }} - {{ proposal.city }}{% if proposal.neighborhood %}, {{ proposal.neighborhood }}{% endif %}</p>
+        {% if proposal.court and proposal.court.latitude and proposal.court.longitude %}
+        <a class="btn ghost" target="_blank" rel="noopener" href="https://www.google.com/maps?q={{ proposal.court.latitude }},{{ proposal.court.longitude }}">Ver rota</a>
+        {% endif %}
+    </article>
+    <article class="data-card">
+        <h2>Resposta</h2>
+        {% if proposal.status == "Pendente" and (proposal.target_team.owner_id == current_user.id or current_user.is_admin) %}
+        <div class="actions-inline">
+            <form method="post" action="{{ url_for('teams.accept_proposal', id=proposal.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn accent">Aceitar e criar partida</button></form>
+            <form method="post" action="{{ url_for('teams.reject_proposal', id=proposal.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger">Recusar</button></form>
+        </div>
+        {% else %}
+        <p class="muted">Status atual: {{ proposal.status }}</p>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}

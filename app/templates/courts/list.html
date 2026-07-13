@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading">
+    <div>
+        <p class="eyebrow">Quadras</p>
+        <h1>Locais cadastrados</h1>
+        <p>Use uma quadra cadastrada ao publicar um amistoso. O sistema impede dois jogos no mesmo horário.</p>
+    </div>
+    <a class="btn accent" href="{{ url_for('courts.create_court') }}">Cadastrar quadra</a>
+</section>
+<section class="card-grid">
+    {% for court in courts %}
+    <article class="data-card court-card">
+        <div class="court-art"></div>
+        <div class="card-title-row">
+            <h3>{{ court.name }}</h3>
+            <span class="badge {{ 'success' if court.approved else 'warning' }}">{{ "Aprovada" if court.approved else "Em analise" }}</span>
+        </div>
+        <p>{{ court.city }} - {{ court.neighborhood or "sem bairro" }}</p>
+        <span>{{ court.floor_type }} - {{ "Coberta" if court.is_covered else "Descoberta" }}</span>
+        {% if court.distance_km is defined and court.distance_km is not none %}<p class="muted">{{ court.distance_km }} km da sede do seu time</p>{% endif %}
+        <a class="btn ghost full" href="{{ url_for('courts.detail', slug=court.slug) }}">Ver quadra</a>
+    </article>
+    {% else %}
+    <div class="empty-state">Nenhuma quadra cadastrada.</div>
+    {% endfor %}
+</section>
+{% endblock %}

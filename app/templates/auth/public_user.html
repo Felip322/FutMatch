@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-head">
+    <div class="avatar-xl">{{ user.display_name[:2].upper() }}</div>
+    <div><p class="eyebrow">Responsável</p><h1>{{ user.display_name }}</h1><p>{{ user.city or "-" }}{% if user.neighborhood %} - {{ user.neighborhood }}{% endif %}</p></div>
+    <span class="reliable-badge"><i class="bi bi-patch-check-fill"></i>{{ reputation }}% reputacao</span>
+</section>
+<section class="dashboard-grid compact-stats">
+    <article class="data-card stat"><span>Times</span><strong>{{ teams|length }}</strong></article>
+    <article class="data-card stat"><span>Quadras</span><strong>{{ courts|length }}</strong></article>
+    <article class="data-card stat"><span>Posts</span><strong>{{ posts|length }}</strong></article>
+    <article class="data-card stat"><span>Amistosos</span><strong>{{ friendlies|length }}</strong></article>
+</section>
+<section class="split-layout">
+    <article class="data-card"><h2>Times administrados</h2>{% for team in teams %}<a class="list-row" href="{{ url_for('teams.detail', slug=team.slug) }}"><span>{{ team.name }}</span><small>{{ team.city }}{% if team.neighborhood %} - {{ team.neighborhood }}{% endif %}</small></a>{% else %}<p class="muted">Nenhum time cadastrado.</p>{% endfor %}</article>
+    <article class="data-card"><h2>Quadras cadastradas</h2>{% for court in courts %}<a class="list-row" href="{{ url_for('courts.detail', slug=court.slug) }}"><span>{{ court.name }}</span><small>{{ "Aprovada" if court.approved else "Em analise" }}</small></a>{% else %}<p class="muted">Nenhuma quadra cadastrada.</p>{% endfor %}</article>
+</section>
+<section class="split-layout">
+    <article class="data-card"><h2>Histórico de ações</h2>{% for friendly in friendlies %}<a class="list-row" href="{{ url_for('challenges.friendly_detail', id=friendly.id) }}"><span>Publicou amistoso</span><small>{{ friendly.match_date.strftime("%d/%m") }} - {{ friendly.location_name }}</small></a>{% else %}<p class="muted">Sem ações recentes.</p>{% endfor %}</article>
+    <article class="data-card"><h2>Posts recentes</h2>{% for post in posts %}<p>{{ post.content }}</p>{% else %}<p class="muted">Sem posts recentes.</p>{% endfor %}</article>
+</section>
+{% endblock %}

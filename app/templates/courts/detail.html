@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-head">
+    {% if court.cover_image %}<img class="court-cover-thumb" src="{{ url_for('static', filename=court.cover_image) }}" alt="{{ court.name }}">{% else %}<div class="court-logo"><i class="bi bi-geo-alt"></i></div>{% endif %}
+    <div>
+        <p class="eyebrow">{{ court.floor_type }} - {{ "Coberta" if court.is_covered else "Descoberta" }}</p>
+        <h1>{{ court.name }}</h1>
+        <p>{{ court.address }}{% if court.address_number %}, {{ court.address_number }}{% endif %} - {{ court.city }} / {{ court.neighborhood or "sem bairro" }}</p>
+    </div>
+    {% if current_user.is_authenticated and (current_user.id == court.owner_id or current_user.is_admin) %}
+    <a class="btn ghost" href="{{ url_for('courts.edit_court', slug=court.slug) }}">Editar</a>
+    {% endif %}
+</section>
+<section class="split-layout">
+    <div id="map" class="map" data-lat="{{ court.latitude or -23.5505 }}" data-lng="{{ court.longitude or -46.6333 }}"></div>
+    <article class="data-card">
+        <h2>Estrutura</h2>
+        <p>{{ court.description or "Quadra cadastrada para selecao em amistosos." }}</p>
+        <p>{{ "Estacionamento" if court.parking else "Sem estacionamento" }} - {{ "Vestiario" if court.locker_room else "Sem vestiario" }}</p>
+        <p>{{ "Chuveiro" if court.shower else "Sem chuveiro" }} - {{ "Lanchonete" if court.snack_bar else "Sem lanchonete" }}</p>
+        <p>{{ "Arquibancada" if court.bleachers else "Sem arquibancada" }}</p>
+        <a class="btn accent full" href="{{ url_for('challenges.create_friendly') }}">Usar em um amistoso</a>
+    </article>
+</section>
+{% endblock %}

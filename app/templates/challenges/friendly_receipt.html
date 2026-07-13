@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-head">
+    <div class="versus">OK</div>
+    <div><p class="eyebrow">Comprovante de combinacao</p><h1>{{ post.team.name }} x {{ accepted_request.requester_team.name if accepted_request else "Adversario confirmado" }}</h1><p>Status: {{ post.status }}</p></div>
+</section>
+<section class="data-card">
+    <p><strong>Data:</strong> {{ post.match_date.strftime("%d/%m/%Y") }}</p>
+    <p><strong>Horário:</strong> {{ post.start_time.strftime("%H:%M") }}</p>
+    <p><strong>Local:</strong> {{ post.location_name }}{% if post.court %} (quadra cadastrada){% endif %} - {{ post.address }}{% if post.court and post.court.address_number %}, {{ post.court.address_number }}{% endif %}</p>
+    <p><strong>Responsaveis:</strong> {{ post.team.owner.display_name }}{% if accepted_request %} e {{ accepted_request.requester_team.owner.display_name }}{% endif %}</p>
+    <p><strong>Formato:</strong> {{ post.players_count }}x{{ post.players_count }}, {{ post.duration_minutes }} min, tolerancia {{ post.tolerance_minutes }} min</p>
+    <p><strong>Uniforme:</strong> {{ post.uniform or "A combinar" }}</p>
+    <p><strong>Regras:</strong> {{ post.rules or "Regras padrao de futsal." }}</p>
+</section>
+{% endblock %}

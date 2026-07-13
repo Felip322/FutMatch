@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-panel">
+    <form method="post" class="form-card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <p class="eyebrow">Fair play</p>
+        <h1>Avaliar {{ reviewed_team.name }}</h1>
+        <label class="check"><input type="checkbox" name="showed_up" checked><span>Compareceu</span></label>
+        <label class="check"><input type="checkbox" name="punctual" checked><span>Foi pontual</span></label>
+        <label class="check"><input type="checkbox" name="respected_agreement" checked><span>Respeitou o combinado</span></label>
+        <label class="check"><input type="checkbox" name="good_behavior" checked><span>Teve bom comportamento</span></label>
+        <label class="form-field"><span>Comentario opcional</span><textarea class="input" name="comment"></textarea></label>
+        <button class="btn accent full">Salvar avaliação</button>
+    </form>
+</section>
+{% endblock %}

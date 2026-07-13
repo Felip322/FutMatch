@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><h1>Revisao de placares</h1></section>
+<section class="card-grid">
+    {% for match in matches %}
+    <article class="data-card">
+        <h3>{{ match.home_team.name }} x {{ match.away_team.name }}</h3>
+        <p>{{ match.match_date.strftime("%d/%m/%Y") }} - {{ match.result_status }}</p>
+        {% for confirmation in match.confirmations %}<p>{{ confirmation.team.name }}: {{ "realizado" if confirmation.happened else "não realizado" }} {{ confirmation.home_score if confirmation.home_score is not none else "" }} x {{ confirmation.away_score if confirmation.away_score is not none else "" }}</p>{% endfor %}
+        <a class="btn accent full" href="{{ url_for('matches.confirm_result', id=match.id) }}">Revisar como admin</a>
+    </article>
+    {% else %}<div class="empty-state">Nenhum placar para revisar.</div>{% endfor %}
+</section>
+{% endblock %}

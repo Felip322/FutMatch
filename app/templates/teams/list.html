@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><p class="eyebrow">Equipes</p><h1>Times prontos para jogar</h1><a class="btn accent" href="{{ url_for('teams.create_team') }}">Criar equipe</a></section>
+<form class="filter-bar"><input class="input" name="city" placeholder="Filtrar por cidade" value="{{ request.args.get('city','') }}"><button class="btn ghost">Filtrar</button></form>
+<section class="card-grid">{% for team in teams %}<article class="team-card"><div class="crest">{{ team.short_name or team.name[:2] }}</div><h3>{{ team.name }}</h3><p>{{ team.city }} · {{ team.neighborhood }}</p><span>{{ team.category }} · {{ team.skill_level }}</span><div class="meter"><i style="width: {{ team.reliability_score }}%"></i></div><a class="btn ghost full" href="{{ url_for('teams.detail', slug=team.slug) }}">Ver equipe</a></article>{% else %}<div class="empty-state">Nenhuma equipe encontrada.</div>{% endfor %}</section>
+{% endblock %}

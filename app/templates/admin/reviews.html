@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block content %}<section class="page-heading"><h1>Avaliações</h1></section><section class="data-card">{% for review in reviews %}<p><strong>{{ review.reviewed_team.name }}</strong> recebeu avaliação de {{ review.reviewer_team.name }}. {{ review.comment or "" }}</p>{% else %}<p class="muted">Sem avaliações.</p>{% endfor %}</section>{% endblock %}

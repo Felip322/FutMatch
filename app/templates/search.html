@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading">
+    <div>
+        <p class="eyebrow">Busca</p>
+        <h1>Resultados{% if term %} para "{{ term }}"{% endif %}</h1>
+        <p>Encontre rapidamente times, quadras cadastradas e amistosos abertos na plataforma.</p>
+    </div>
+</section>
+<form class="filter-bar sticky-filter" action="{{ url_for('main.search') }}">
+    <label><span>Buscar</span><input class="input" name="q" placeholder="Digite time, bairro, cidade ou quadra" value="{{ term }}"></label>
+    <button class="btn accent"><i class="bi bi-search"></i>Buscar</button>
+</form>
+{% if not term %}
+<section class="empty-state action-empty"><div><i class="bi bi-search"></i><h2>Comece pesquisando algo</h2><p>Use o nome do time, bairro, cidade ou quadra.</p></div></section>
+{% else %}
+<section class="search-grid">
+    <article class="data-card">
+        <h2>Times</h2>
+        {% for team in teams %}
+        <a class="inbox-row" href="{{ url_for('teams.detail', slug=team.slug) }}"><span class="inbox-avatar">{{ team.short_name or team.name[:2] }}</span><span><strong>{{ team.name }}</strong><small>{{ team.city }}{% if team.neighborhood %} - {{ team.neighborhood }}{% endif %}</small></span><i class="bi bi-chevron-right"></i></a>
+        {% else %}<p class="muted">Nenhum time encontrado.</p>{% endfor %}
+    </article>
+    <article class="data-card">
+        <h2>Quadras</h2>
+        {% for court in courts %}
+        <a class="inbox-row" href="{{ url_for('courts.detail', slug=court.slug) }}"><span class="inbox-avatar"><i class="bi bi-geo-alt"></i></span><span><strong>{{ court.name }}</strong><small>{{ court.city }}{% if court.neighborhood %} - {{ court.neighborhood }}{% endif %}</small></span><i class="bi bi-chevron-right"></i></a>
+        {% else %}<p class="muted">Nenhuma quadra encontrada.</p>{% endfor %}
+    </article>
+    <article class="data-card">
+        <h2>Amistosos</h2>
+        {% for post in friendlies %}
+        <a class="inbox-row" href="{{ url_for('challenges.friendly_detail', id=post.id) }}"><span class="inbox-avatar">{{ post.match_date.strftime("%d") }}</span><span><strong>{{ post.team.name }}</strong><small>{{ post.location_name }} - {{ post.match_date.strftime("%d/%m") }} {{ post.start_time.strftime("%H:%M") }}</small></span><i class="bi bi-chevron-right"></i></a>
+        {% else %}<p class="muted">Nenhum amistoso encontrado.</p>{% endfor %}
+    </article>
+</section>
+{% endif %}
+{% endblock %}

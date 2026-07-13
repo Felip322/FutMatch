@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading">
+    <div>
+        <p class="eyebrow">Admin</p>
+        <h1>Painel administrativo</h1>
+        <p>Monitore cadastros, amistosos, placares pendentes, divergencias e aprovacoes da plataforma.</p>
+    </div>
+</section>
+<section class="dashboard-grid compact-stats">
+    {% for label, value in [("Usuarios", stats.users), ("Equipes", stats.teams), ("Quadras", stats.courts), ("Partidas", stats.matches), ("Amistosos", stats.friendlies), ("Sem placar", stats.missing_scores), ("Divergencias", stats.score_conflicts), ("Bloqueados", stats.blocked)] %}
+    <article class="data-card stat mini"><span>{{ label }}</span><strong>{{ value }}</strong></article>
+    {% endfor %}
+</section>
+<section class="admin-action-grid">
+    <a class="admin-action-card priority" href="{{ url_for('admin.matches_review') }}"><img src="{{ url_for('static', filename='images/icons/score.svg') }}" alt=""><span><strong>Revisar placares</strong><small>{{ stats.score_conflicts }} divergencia(s), {{ stats.missing_scores }} sem placar</small></span><i class="bi bi-chevron-right"></i></a>
+    <a class="admin-action-card" href="{{ url_for('admin.courts') }}"><img src="{{ url_for('static', filename='images/icons/court.svg') }}" alt=""><span><strong>Aprovar quadras</strong><small>Validar locais cadastrados pelos usuários</small></span><i class="bi bi-chevron-right"></i></a>
+    <a class="admin-action-card" href="{{ url_for('admin.friendlies') }}"><img src="{{ url_for('static', filename='images/icons/friendly.svg') }}" alt=""><span><strong>Ver amistosos</strong><small>Status, cancelamentos e solicitações</small></span><i class="bi bi-chevron-right"></i></a>
+    <a class="admin-action-card" href="{{ url_for('admin.users') }}"><img src="{{ url_for('static', filename='images/icons/admin.svg') }}" alt=""><span><strong>Usuarios e bloqueios</strong><small>Contas ativas, bloqueadas e responsaveis</small></span><i class="bi bi-chevron-right"></i></a>
+    <a class="admin-action-card" href="{{ url_for('admin.teams') }}"><img src="{{ url_for('static', filename='images/icons/team.svg') }}" alt=""><span><strong>Times cadastrados</strong><small>Campanha, confiança e fair play</small></span><i class="bi bi-chevron-right"></i></a>
+    <a class="admin-action-card" href="{{ url_for('admin.reviews') }}"><img src="{{ url_for('static', filename='images/icons/ranking.svg') }}" alt=""><span><strong>Avaliações</strong><small>Fair play informado após os jogos</small></span><i class="bi bi-chevron-right"></i></a>
+    <a class="admin-action-card priority" href="{{ url_for('admin.reports') }}"><i class="bi bi-flag"></i><span><strong>Denuncias</strong><small>{{ stats.reports }} pendente(s) para revisar</small></span><i class="bi bi-chevron-right"></i></a>
+    <a class="admin-action-card" href="{{ url_for('admin.media') }}"><i class="bi bi-images"></i><span><strong>Midias recentes</strong><small>{{ stats.recent_images }} imagem(ns) no feed</small></span><i class="bi bi-chevron-right"></i></a>
+    <a class="admin-action-card" href="{{ url_for('admin.badges') }}"><i class="bi bi-award"></i><span><strong>Selos FutMatch</strong><small>Catalogo e conquistas dos times</small></span><i class="bi bi-chevron-right"></i></a>
+</section>
+{% endblock %}

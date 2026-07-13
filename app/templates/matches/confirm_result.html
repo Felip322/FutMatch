@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="post-confirm-page">
+    <form method="post" class="post-confirm-card" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <p class="eyebrow">Confirmação pós-jogo</p>
+        <h1>O jogo aconteceu?</h1>
+        <p>{{ match.home_team.name }} x {{ match.away_team.name }} - {{ match.match_date.strftime("%d/%m/%Y") }} as {{ match.start_time.strftime("%H:%M") }}</p>
+        {% if current_user.is_admin %}
+        <label class="form-field"><span>Confirmar como</span><select class="input" name="team_id"><option value="{{ match.home_team_id }}">{{ match.home_team.name }}</option><option value="{{ match.away_team_id }}">{{ match.away_team.name }}</option></select></label>
+        {% endif %}
+        <input type="hidden" name="happened" id="happened-value" value="yes">
+        <div class="happened-toggle">
+            <button type="button" class="happened-option active" data-happened-value="yes"><i class="bi bi-check-circle"></i><strong>Sim</strong><small>Informar placar</small></button>
+            <button type="button" class="happened-option" data-happened-value="no"><i class="bi bi-x-circle"></i><strong>Não</strong><small>Registrar motivo</small></button>
+        </div>
+        <div class="score-panel" id="score-fields">
+            <label class="score-input"><span>{{ match.home_team.name }}</span><input class="input" type="number" min="0" name="home_score" value="0"></label>
+            <strong>x</strong>
+            <label class="score-input"><span>{{ match.away_team.name }}</span><input class="input" type="number" min="0" name="away_score" value="0"></label>
+        </div>
+        <label class="form-field"><span>Foto/comprovante do jogo</span><input class="input" type="file" name="proof_image" accept="image/png,image/jpeg,image/webp"></label>
+        <label class="form-field"><span>Observação</span><textarea class="input" name="notes" placeholder="Opcional, especialmente se o jogo não aconteceu."></textarea></label>
+        <button class="btn accent full"><i class="bi bi-clipboard-check"></i>Salvar confirmação</button>
+    </form>
+</section>
+{% endblock %}

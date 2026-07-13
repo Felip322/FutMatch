@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading"><div><p class="eyebrow">Admin</p><h1>Selos FutMatch</h1><p>Controle o catalogo de conquistas e acompanhe os times premiados.</p></div></section>
+<section class="split-layout">
+    <article class="data-card">
+        <h2>Catalogo</h2>
+        {% for badge in catalog %}
+        <div class="badge-admin-row"><img src="{{ url_for('static', filename='images/badges/' ~ badge.icon ~ '.svg') }}" alt=""><span><strong>{{ badge.name }}</strong><small>{{ badge.category }} - {{ badge.description }}</small></span></div>
+        {% else %}<p class="muted">Nenhum selo cadastrado.</p>{% endfor %}
+    </article>
+    <article class="data-card">
+        <h2>Ultimas conquistas</h2>
+        {% for item in awarded %}
+        <a class="badge-admin-row" href="{{ url_for('teams.detail', slug=item.team.slug) }}"><img src="{{ url_for('static', filename='images/badges/' ~ item.badge.icon ~ '.svg') }}" alt=""><span><strong>{{ item.team.name }}</strong><small>{{ item.badge.name }} - {{ item.awarded_at.strftime("%d/%m/%Y %H:%M") }}</small></span></a>
+        {% else %}<p class="muted">Nenhuma conquista ainda.</p>{% endfor %}
+    </article>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{
+  "name": "FutMatch",
+  "short_name": "FutMatch",
+  "description": "Amistosos de futsal organizados entre times.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "icons": [
+    {
+      "src": "/static/images/app-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

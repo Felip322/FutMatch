@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading"><div><p class="eyebrow">Admin</p><h1>Midias e imagens</h1><p>Acompanhe imagens recentes do feed e quadras sem foto.</p></div></section>
+<section class="split-layout">
+    <article class="data-card"><h2>Imagens do feed</h2>{% for post in posts %}<div class="media-row">{% if post.image_path %}<img src="{{ url_for('static', filename=post.image_path) }}" alt="Imagem do post">{% elif post.image_url %}<img src="{{ post.image_url }}" alt="Imagem do post">{% endif %}<span>{{ post.team.name }}<small>{{ post.created_at.strftime("%d/%m/%Y") }}</small></span></div>{% else %}<p class="muted">Nenhuma imagem no feed.</p>{% endfor %}</article>
+    <article class="data-card"><h2>Quadras sem foto</h2>{% for court in courts_pending_image %}<a class="list-row" href="{{ url_for('courts.detail', slug=court.slug) }}"><span>{{ court.name }}</span><small>{{ court.city }}{% if court.neighborhood %} - {{ court.neighborhood }}{% endif %}</small></a>{% else %}<p class="muted">Todas as quadras recentes tem foto.</p>{% endfor %}</article>
+</section>
+{% endblock %}

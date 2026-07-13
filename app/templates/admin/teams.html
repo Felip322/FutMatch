@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block content %}<section class="page-heading"><h1>Equipes</h1></section><section class="card-grid">{% for team in teams %}<article class="data-card"><h3>{{ team.name }}</h3><p>{{ team.city }} · {{ team.owner.email }}</p><a class="btn ghost full" href="{{ url_for('teams.detail', slug=team.slug) }}">Abrir</a></article>{% endfor %}</section>{% endblock %}

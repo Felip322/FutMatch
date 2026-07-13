@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% from "components/form_macros.html" import field %}
+{% block content %}
+<section class="auth-panel">
+    <form method="post" class="form-card">
+        {{ form.hidden_tag() }}
+        <h1>Entrar</h1><p>Acesse sua agenda, desafios e notificacoes.</p>
+        {{ field(form.email) }}{{ field(form.password) }}
+        <label class="check">{{ form.remember() }}<span>Manter conectado</span></label>
+        {{ form.submit(class_="btn accent full") }}
+        <a href="{{ url_for('auth.forgot_password') }}">Recuperar senha</a>
+    </form>
+</section>
+{% endblock %}

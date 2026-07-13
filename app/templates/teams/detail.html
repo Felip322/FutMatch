@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="team-hero">
+    <div class="team-banner" {% if team.banner_image %}style="background-image: linear-gradient(135deg, rgba(7,17,31,.1), rgba(7,17,31,.72)), url('{{ url_for('static', filename=team.banner_image) }}'); background-size: cover; background-position: center;"{% endif %}></div>
+    <div class="team-profile-row">
+        {% if team.logo %}<img class="team-logo-img" src="{{ url_for('static', filename=team.logo) }}" alt="{{ team.name }}">{% else %}<div class="crest big">{{ team.short_name or team.name[:2] }}</div>{% endif %}
+        <div>
+            <p class="eyebrow">{{ team.category }} - {{ team.skill_level }}</p>
+            <h1>{{ team.name }}</h1>
+            <p>{{ team.city }}{% if team.neighborhood %} - {{ team.neighborhood }}{% endif %} - Fair Play {{ team.fair_play_score }}</p>
+            {% if trusted %}<span class="reliable-badge"><i class="bi bi-patch-check-fill"></i>Selo de time confiável</span>{% endif %}
+        </div>
+        <div class="actions-inline">
+            {% if current_user.is_authenticated and current_user.id == team.owner_id %}
+            <a class="btn accent" href="{{ url_for('challenges.create_friendly') }}"><i class="bi bi-calendar-plus"></i>Publicar amistoso</a>
+            <a class="btn ghost" href="{{ url_for('teams.agenda', slug=team.slug) }}"><i class="bi bi-calendar3"></i>Agenda</a>
+            {% else %}
+            <a class="btn accent" href="{{ url_for('teams.invite', slug=team.slug) }}"><i class="bi bi-send"></i>Convidar para amistoso</a>
+            <a class="btn ghost" href="{{ url_for('teams.public_detail', slug=team.slug) }}"><i class="bi bi-share"></i>Perfil público</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+<section class="data-card badge-panel">
+    <div class="card-title-row"><h2>Selos FutMatch</h2><span class="badge">{{ badges|length }} conquistado(s)</span></div>
+    <div class="badge-grid">
+        {% for item in badges %}
+        <article class="badge-card"><img src="{{ url_for('static', filename='images/badges/' ~ item.badge.icon ~ '.svg') }}" alt=""><span><strong>{{ item.badge.name }}</strong><small>{{ item.badge.description }}</small></span></article>
+        {% else %}<p class="muted">Os selos aparecem conforme o time usa a plataforma, confirma jogos e recebe avaliações.</p>{% endfor %}
+    </div>
+</section>
+<form class="filter-bar ranking-filter">
+    <label><span>Estatísticas</span><select class="input" name="period" onchange="this.form.submit()"><option value="all" {% if period == "all" %}selected{% endif %}>Geral</option><option value="month" {% if period == "month" %}selected{% endif %}>Mês atual</option><option value="season" {% if period == "season" %}selected{% endif %}>Temporada 2026</option><option value="last10" {% if period == "last10" %}selected{% endif %}>Últimos 10 jogos</option></select></label>
+</form>
+<section class="gamification-grid">
+    <article class="game-card"><i class="bi bi-patch-check-fill"></i><span><strong>{{ "Confiável" if trusted else "Em construção" }}</strong><small>Status de confiança</small></span></article>
+    <article class="game-card"><i class="bi bi-lightning-charge-fill"></i><span><strong>{{ activity_level }}</strong><small>Nível de atividade</small></span></article>
+    <article class="game-card"><i class="bi bi-geo-alt-fill"></i><span><strong>#{{ local_position or "-" }}</strong><small>Top do bairro</small></span></article>
+    <article class="game-card"><i class="bi bi-heart-fill"></i><span><strong>{{ team.fair_play_score }}</strong><small>Fair play</small></span></article>
+</section>
+<section class="dashboard-grid compact-stats">
+    <article class="data-card stat"><span>Jogos</span><strong>{{ stats.played }}</strong></article>
+    <article class="data-card stat"><span>Vitórias</span><strong>{{ stats.wins }}</strong></article>
+    <article class="data-card stat"><span>Empates</span><strong>{{ stats.draws }}</strong></article>
+    <article class="data-card stat"><span>Derrotas</span><strong>{{ stats.losses }}</strong></article>
+    <article class="data-card stat"><span>Gols marcados</span><strong>{{ stats.goals_for }}</strong></article>
+    <article class="data-card stat"><span>Gols sofridos</span><strong>{{ stats.goals_against }}</strong></article>
+    <article class="data-card stat"><span>Saldo</span><strong>{{ stats.goal_balance }}</strong></article>
+    <article class="data-card stat"><span>Aproveitamento</span><strong>{{ stats.performance }}%</strong></article>
+</section>
+<section class="split-layout">
+    <article class="data-card timeline-card">
+        <h2>Últimos jogos</h2>
+        {% for item in last_opponents %}
+        <a class="timeline-row" href="{{ url_for('teams.detail', slug=item.team.slug) }}"><i></i><span>{{ item.team.name }}</span><small>{{ item.score }} - {{ item.match.match_date.strftime("%d/%m/%Y") }}</small></a>
+        {% else %}<p class="muted">Sem jogos finalizados ainda.</p>{% endfor %}
+    </article>
+    <article class="data-card">
+        <h2>Perfil do time</h2>
+        <p>{{ team.description or "Time cadastrado no FutMatch para organizar amistosos." }}</p>
+        <p><strong>Categoria:</strong> {{ team.category or "-" }}</p>
+        <p><strong>Nivel:</strong> {{ team.skill_level or "-" }}</p>
+        <p><strong>Base:</strong> {{ team.home_location or team.neighborhood or "-" }}</p>
+    </article>
+</section>
+<section class="split-layout">
+    <article class="data-card">
+        <div class="card-title-row"><h2>Posts do time</h2><a class="btn ghost" href="{{ url_for('feed.feed') }}">Ver feed</a></div>
+        {% for post in team_posts %}
+        <article class="mini-social-post">
+            <p>{{ post.content }}</p>
+            {% if post.image_path %}<img src="{{ url_for('static', filename=post.image_path) }}" alt="Imagem publicada por {{ team.name }}">{% elif post.image_url %}<img src="{{ post.image_url }}" alt="Imagem publicada por {{ team.name }}">{% endif %}
+            <small>{{ post.created_at.strftime("%d/%m/%Y %H:%M") }}</small>
+        </article>
+        {% else %}<p class="muted">Esse time ainda não publicou no feed.</p>{% endfor %}
+    </article>
+    <article class="data-card">
+        <h2>Reputação</h2>
+        <div class="reputation-meter"><span style="width: {{ team.reliability_score or 0 }}%"></span></div>
+        <p><strong>{{ team.reliability_score or 0 }}%</strong> de confiança</p>
+        <ul class="reputation-list">
+            <li><span>Jogos realizados</span><strong>{{ stats.played }}</strong></li>
+            <li><span>Confirmação de placar</span><strong>{{ "Boa" if stats.played else "Inicial" }}</strong></li>
+            <li><span>Fair play</span><strong>{{ team.fair_play_score }}</strong></li>
+            <li><span>Cancelamentos</span><strong>Monitorado</strong></li>
+            <li><span>Divergências</span><strong>Monitorado</strong></li>
+        </ul>
+    </article>
+</section>
+<section class="data-card chart-card"><h2>Campanha</h2><canvas id="teamStats"></canvas></section>
+{% endblock %}
+{% block scripts %}<script>new Chart(document.getElementById('teamStats'),{type:'bar',data:{labels:['V','E','D','GM','GS'],datasets:[{label:'Temporada',data:[{{ stats.wins }},{{ stats.draws }},{{ stats.losses }},{{ stats.goals_for }},{{ stats.goals_against }}],backgroundColor:'#b7ff2a'}]}});</script>{% endblock %}

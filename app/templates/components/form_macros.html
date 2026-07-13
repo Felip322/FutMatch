@@ -1,0 +1,7 @@
+{% macro field(field) %}
+<label class="form-field">
+    <span>{{ field.label.text }}</span>
+    {{ field(class_="input") }}
+    {% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+</label>
+{% endmacro %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">Placares pendentes</p><h1>Confirme os jogos encerrados</h1></div></section>
+<section class="card-grid">
+    {% for match in matches %}
+    <article class="data-card">
+        <h3>{{ match.home_team.name }} x {{ match.away_team.name }}</h3>
+        <p>{{ match.match_date.strftime("%d/%m/%Y") }} as {{ match.start_time.strftime("%H:%M") }}</p>
+        <a class="btn accent full" href="{{ url_for('matches.confirm_result', id=match.id) }}">Informar placar</a>
+    </article>
+    {% else %}<div class="empty-state">Nenhum resultado pendente.</div>{% endfor %}
+</section>
+{% endblock %}

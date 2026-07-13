@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading">
+    <div>
+        <p class="eyebrow">Feed dos times</p>
+        <h1>Comunidade FutMatch</h1>
+        <p>Poste bastidores, resultados, fotos do time, avisos e momentos da rodada.</p>
+    </div>
+</section>
+<section class="feed-layout">
+    <aside class="data-card feed-composer">
+        <h2>Publicar pelo time</h2>
+        {% if team %}
+        <form method="post" action="{{ url_for('feed.create_post') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label class="form-field"><span>Mensagem</span><textarea class="input" name="content" placeholder="Ex: Treino forte hoje. Buscamos amistoso para sexta!" required></textarea></label>
+            <label class="form-field"><span>Foto do post</span><input class="input" type="file" name="image" accept="image/png,image/jpeg,image/webp"></label>
+            <label class="form-field"><span>Ou imagem por link</span><input class="input" name="image_url" placeholder="https://..."></label>
+            <button class="btn accent full"><i class="bi bi-send"></i>Publicar</button>
+        </form>
+        {% else %}
+        <div class="empty-state action-empty"><div><i class="bi bi-shield-plus"></i><h2>Crie seu time</h2><p>Depois disso você pode postar no feed.</p><a class="btn accent" href="{{ url_for('teams.create_team') }}">Criar time</a></div></div>
+        {% endif %}
+    </aside>
+    <section class="team-feed">
+        {% for post in posts %}
+        <article class="social-post">
+            <header>
+                <a class="inbox-avatar" href="{{ url_for('teams.detail', slug=post.team.slug) }}">{{ post.team.short_name or post.team.name[:2] }}</a>
+                <div><a href="{{ url_for('teams.detail', slug=post.team.slug) }}"><strong>{{ post.team.name }}</strong></a><small>{{ post.created_at.strftime("%d/%m/%Y %H:%M") }} - {{ post.team.city }}{% if post.team.neighborhood %}, {{ post.team.neighborhood }}{% endif %}</small></div>
+            </header>
+            <p>{{ post.content }}</p>
+            {% if post.image_path %}<img class="social-image" src="{{ url_for('static', filename=post.image_path) }}" alt="Imagem publicada por {{ post.team.name }}">{% elif post.image_url %}<img class="social-image" src="{{ post.image_url }}" alt="Imagem publicada por {{ post.team.name }}">{% endif %}
+            <footer>
+                <form class="ajax-like" method="post" action="{{ url_for('feed.like_post', id=post.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="link-button"><i class="bi bi-heart"></i><span data-like-count>{{ post.likes_count or 0 }}</span> curtida(s)</button></form>
+                <span><i class="bi bi-chat"></i><span data-comment-count>{{ post.comments_count or 0 }}</span> comentário(s)</span>
+                <a href="{{ url_for('challenges.friendlies', city=post.team.city, neighborhood=post.team.neighborhood or '') }}">Ver amistosos da região</a>
+            </footer>
+            <div class="comment-box">
+                {% for comment in post.comments[-3:] %}
+                <p><strong>{{ comment.user.display_name }}</strong> {{ comment.content }}</p>
+                {% endfor %}
+                <form class="ajax-comment" method="post" action="{{ url_for('feed.comment_post', id=post.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input class="input" name="content" placeholder="Comentar como {{ current_user.display_name }}">
+                </form>
+            </div>
+            <details class="report-box">
+                <summary>Denunciar publicação</summary>
+                <form method="post" action="{{ url_for('feed.report_post', id=post.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <label class="form-field"><span>Motivo</span><select class="input" name="reason"><option>conteúdo inadequado</option><option>imagem indevida</option><option>ofensa</option><option>spam</option></select></label>
+                    <label class="form-field"><span>Descrição</span><input class="input" name="description" placeholder="Opcional"></label>
+                    <button class="btn ghost">Enviar denúncia</button>
+                </form>
+            </details>
+            {% if current_user.is_admin %}
+            <div class="moderation-row">
+                <form method="post" action="{{ url_for('feed.hide_post', id=post.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn ghost">{{ "Reexibir" if post.is_hidden else "Ocultar" }}</button></form>
+                <form method="post" action="{{ url_for('feed.remove_image', id=post.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger">Remover imagem</button></form>
+            </div>
+            {% endif %}
+        </article>
+        {% else %}
+        <div class="empty-state action-empty"><div><i class="bi bi-images"></i><h2>Nenhum post ainda</h2><p>Seja o primeiro time a movimentar a comunidade.</p></div></div>
+        {% endfor %}
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading"><div><p class="eyebrow">Ranking</p><h1>Times em destaque</h1><p>Compare campanha, saldo, aproveitamento e fair play por região.</p></div></section>
+<form class="filter-bar sticky-filter ranking-filter">
+    <label><span>Cidade</span><input class="input" name="city" placeholder="Cidade" value="{{ request.args.get('city','') }}"></label>
+    <label><span>Bairro</span><input class="input" name="neighborhood" placeholder="Bairro" value="{{ request.args.get('neighborhood','') }}"></label>
+    <label><span>Período</span><select class="input" name="period"><option value="all" {% if period == "all" %}selected{% endif %}>Geral</option><option value="month" {% if period == "month" %}selected{% endif %}>Mês atual</option><option value="season" {% if period == "season" %}selected{% endif %}>Temporada 2026</option><option value="last10" {% if period == "last10" %}selected{% endif %}>Últimos 10 jogos</option></select></label>
+    <button class="btn accent"><i class="bi bi-funnel"></i>Filtrar</button>
+</form>
+{% if rows %}
+<section class="ranking-story-grid">
+    <article class="story-card"><span>Mais ativo</span><strong>{{ highlights.most_active.team.name if highlights.most_active else "-" }}</strong><small>{{ highlights.most_active.stats.played if highlights.most_active else 0 }} jogos</small></article>
+    <article class="story-card"><span>Melhor fair play</span><strong>{{ highlights.best_fair_play.team.name if highlights.best_fair_play else "-" }}</strong><small>{{ highlights.best_fair_play.team.fair_play_score if highlights.best_fair_play else 0 }}</small></article>
+    <article class="story-card"><span>Melhor saldo</span><strong>{{ highlights.best_balance.team.name if highlights.best_balance else "-" }}</strong><small>{{ highlights.best_balance.stats.goal_balance if highlights.best_balance else 0 }} gols</small></article>
+    <article class="story-card"><span>Destaque do bairro</span><strong>{{ highlights.neighborhood.team.name if highlights.neighborhood else "-" }}</strong><small>{{ highlights.neighborhood.team.neighborhood if highlights.neighborhood else "-" }}</small></article>
+</section>
+<section class="podium-grid">
+    {% for row in rows[:3] %}
+    <a class="podium-card podium-{{ loop.index }}" href="{{ url_for('teams.detail', slug=row.team.slug) }}">
+        <span class="medal">{{ loop.index }}</span>
+        <strong>{{ row.team.name }}</strong>
+        <small>{{ row.stats.performance }}% aproveitamento</small>
+        <em>{{ row.stats.wins }} vitórias</em>
+    </a>
+    {% endfor %}
+</section>
+{% endif %}
+<section class="data-card table-wrap">
+    <table>
+        <thead><tr><th>#</th><th>Time</th><th>V</th><th>E</th><th>D</th><th>Saldo</th><th>Aprov.</th><th>Fair play</th></tr></thead>
+        <tbody>
+        {% for row in rows %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td><a href="{{ url_for('teams.detail', slug=row.team.slug) }}">{{ row.team.name }}</a><div class="rank-badges">{% for item in row.badges %}<img title="{{ item.badge.name }}" src="{{ url_for('static', filename='images/badges/' ~ item.badge.icon ~ '.svg') }}" alt="{{ item.badge.name }}">{% endfor %}</div></td>
+            <td>{{ row.stats.wins }}</td>
+            <td>{{ row.stats.draws }}</td>
+            <td>{{ row.stats.losses }}</td>
+            <td>{{ row.stats.goal_balance }}</td>
+            <td>{{ row.stats.performance }}%</td>
+            <td>{{ row.team.fair_play_score }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

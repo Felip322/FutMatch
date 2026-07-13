@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% from "components/form_macros.html" import field %}
+{% block content %}
+<section class="auth-panel wide">
+    <form method="post" class="form-card">
+        {{ form.hidden_tag() }}
+        <h1>Criar conta</h1><p>Depois do cadastro você cria seu time, publica amistosos e acompanha solicitações.</p>
+        <div class="form-grid">
+            {{ field(form.name) }}{{ field(form.email) }}{{ field(form.phone) }}{{ field(form.birth_date) }}
+            {{ field(form.city) }}{{ field(form.state) }}{{ field(form.neighborhood) }}{{ field(form.password) }}{{ field(form.confirm_password) }}
+        </div>
+        <label class="check">{{ form.accept_terms() }}<span>Aceito os termos de uso</span></label>
+        {{ form.submit(class_="btn accent full") }}
+    </form>
+</section>
+{% endblock %}

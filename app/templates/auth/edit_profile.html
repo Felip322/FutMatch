@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% from "components/form_macros.html" import field %}
+{% block content %}
+<section class="split-layout">
+    <form method="post" class="form-card">
+        {{ form.hidden_tag() }}<h1>Editar perfil</h1>
+        {{ field(form.name) }}{{ field(form.nickname) }}{{ field(form.phone) }}{{ field(form.city) }}{{ field(form.state) }}{{ field(form.neighborhood) }}
+        {{ form.submit(class_="btn accent full") }}
+    </form>
+    <form method="post" action="{{ url_for('auth.change_password') }}" class="form-card">
+        {{ password_form.hidden_tag() }}<h2>Alterar senha</h2>
+        {{ field(password_form.current_password) }}{{ field(password_form.password) }}{{ field(password_form.confirm_password) }}
+        {{ password_form.submit(class_="btn ghost full") }}
+    </form>
+</section>
+{% endblock %}

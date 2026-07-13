@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-head">
+    <div class="avatar-xl">{{ current_user.display_name[:2].upper() }}</div>
+    <div><p class="eyebrow">Perfil</p><h1>{{ current_user.display_name }}</h1><p>{{ current_user.city }} · {{ current_user.neighborhood }}</p></div>
+    <a class="btn accent" href="{{ url_for('auth.edit_profile') }}"><i class="bi bi-pencil"></i>Editar</a>
+</section>
+<section class="card-grid two">
+    <article class="data-card"><h3>Dados</h3><p>{{ current_user.email }}</p><p>{{ current_user.phone or "Telefone não informado" }}</p></article>
+    <article class="data-card"><h3>Responsável</h3><p>{{ current_user.city or "Cidade não informada" }}{% if current_user.neighborhood %} - {{ current_user.neighborhood }}{% endif %}</p><div class="actions-inline"><a class="btn ghost" href="{{ url_for('teams.my_team') }}">Meu time</a><a class="btn ghost" href="{{ url_for('auth.public_user', id=current_user.id) }}">Perfil público</a></div></article>
+</section>
+{% endblock %}

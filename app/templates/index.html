@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <p class="eyebrow">Futsal organizado, competitivo e perto de você</p>
+        <h1>Seu próximo jogo começa aqui.</h1>
+        <p>Publique datas disponíveis, receba solicitações de adversários, confirme jogos e acompanhe a campanha do seu time.</p>
+        <div class="hero-actions">
+            <a class="btn accent large" href="{{ url_for('challenges.friendlies') if current_user.is_authenticated else url_for('auth.register') }}"><i class="bi bi-bullseye"></i>Ver amistosos</a>
+            <a class="btn ghost large" href="{{ url_for('teams.create_team') if current_user.is_authenticated else url_for('auth.register') }}"><i class="bi bi-shield-plus"></i>Cadastrar minha equipe</a>
+        </div>
+    </div>
+    <div class="match-orbit" aria-hidden="true">
+        <div class="pitch"><span></span><strong>Amistoso</strong><em>20h</em></div>
+        <div class="orb-card one">Solicitação recebida</div>
+        <div class="orb-card two">Fair Play 4.8</div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-title"><span>Como funciona</span><h2>Do cadastro ao apito inicial</h2></div>
+    <div class="steps">
+        {% for item in ["Cadastre seu único time", "Publique dia, horário e local", "Receba solicitações de adversários", "Aprove ou recuse e registre o placar"] %}
+        <article class="step-card"><strong>{{ loop.index }}</strong><p>{{ item }}</p></article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-title"><span>Recursos</span><h2>Uma central para a vida do time</h2></div>
+    <div class="feature-grid">
+        {% for icon, title, text in [
+            ("icons/friendly.svg", "Amistosos", "Publique dia, horário e local para receber solicitações."),
+            ("icons/team.svg", "Times", "Perfil profissional com campanha, histórico e confiabilidade."),
+            ("icons/score.svg", "Placares", "Confirmação dos dois times e revisão quando houver divergência."),
+            ("icons/court.svg", "Quadras", "Organize local, mapa e estrutura do jogo."),
+            ("icons/ranking.svg", "Ranking", "Classificação por vitórias, aproveitamento e saldo."),
+            ("icons/admin.svg", "Admin", "Visão completa para moderar jogos, placares e usuários.")
+        ] %}
+        <article class="feature-card"><img class="feature-icon" src="{{ url_for('static', filename='images/' ~ icon) }}" alt=""><h3>{{ title }}</h3><p>{{ text }}</p></article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="stats-band">
+    <div><strong>{{ stats.teams }}</strong><span>Equipes cadastradas</span></div>
+    <div><strong>{{ stats.users }}</strong><span>Responsáveis cadastrados</span></div>
+    <div><strong>{{ stats.matches }}</strong><span>Partidas realizadas</span></div>
+    <div><strong>{{ stats.courts }}</strong><span>Quadras disponíveis</span></div>
+</section>
+
+<footer class="footer">
+    <span>FutMatch</span><a>Termos de uso</a><a>Privacidade</a><a>Contato</a><a>Redes sociais</a><small>Todos os direitos reservados.</small>
+</footer>
+{% endblock %}

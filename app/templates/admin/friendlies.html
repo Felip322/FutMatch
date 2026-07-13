@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><h1>Todos os amistosos</h1></section>
+<section class="data-card table-wrap">
+    <table><thead><tr><th>Time</th><th>Data</th><th>Local</th><th>Status</th><th>Solicitações</th><th></th></tr></thead><tbody>
+    {% for post in posts %}
+    <tr><td>{{ post.team.name }}</td><td>{{ post.match_date.strftime("%d/%m/%Y") }} {{ post.start_time.strftime("%H:%M") }}</td><td>{{ post.location_name }}</td><td>{{ post.status }}</td><td>{{ post.requests|length }}</td><td><a class="btn ghost" href="{{ url_for('challenges.friendly_detail', id=post.id) }}">Abrir</a></td></tr>
+    {% endfor %}
+    </tbody></table>
+</section>
+{% endblock %}

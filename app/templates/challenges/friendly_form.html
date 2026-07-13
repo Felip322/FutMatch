@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading">
+    <div>
+        <p class="eyebrow">{{ team.name }}</p>
+        <h1>Publicar amistoso</h1>
+        <p>Escolha uma quadra cadastrada ou informe um local manual. O sistema bloqueia conflito de horário na mesma quadra.</p>
+    </div>
+</section>
+<form method="post" class="form-card form-card-wide pro-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-section">
+        <h2>Quando</h2>
+        <p class="form-help">Defina a janela exata para outros times saberem se conseguem assumir o compromisso.</p>
+        <div class="form-grid three">
+            <label class="form-field"><span>Data disponível</span><input class="input" type="date" name="match_date" required></label>
+            <label class="form-field"><span>Horário</span><input class="input" type="time" name="start_time" required></label>
+            <label class="form-field"><span>Duracao</span><input class="input" type="number" name="duration_minutes" value="60" min="30"></label>
+        </div>
+    </div>
+    <div class="form-section">
+        <h2>Onde</h2>
+        <p class="form-help">Ao selecionar uma quadra cadastrada, os dados do local entram automaticamente e o horário fica protegido contra conflito.</p>
+        <label class="form-field">
+            <span>Quadra cadastrada</span>
+            <select class="input" name="court_id" id="court-select">
+                <option value="">Usar local manual</option>
+                {% for court in courts %}
+                <option value="{{ court.id }}" data-name="{{ court.name }}" data-address="{{ court.address }}" data-city="{{ court.city }}" data-state="{{ court.state }}" data-neighborhood="{{ court.neighborhood or '' }}">{{ court.name }} - {{ court.city }} / {{ court.neighborhood or "sem bairro" }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <div class="form-grid two" id="manual-location">
+            <label class="form-field"><span>Nome do local</span><input class="input" name="location_name" id="location-name" placeholder="Ex: Arena Central"></label>
+            <label class="form-field"><span>Endereco</span><input class="input" name="address" id="location-address"></label>
+            <label class="form-field"><span>Cidade</span><input class="input" name="city" id="location-city" value="{{ team.city }}"></label>
+            <label class="form-field"><span>Estado</span><input class="input" name="state" id="location-state" value="{{ team.state }}" maxlength="2"></label>
+            <label class="form-field"><span>Bairro</span><input class="input" name="neighborhood" id="location-neighborhood" value="{{ team.neighborhood or '' }}"></label>
+        </div>
+    </div>
+    <div class="form-section">
+        <h2>Combinado</h2>
+        <p class="form-help">Essas regras aparecem no resumo oficial quando o amistoso for confirmado.</p>
+        <div class="form-grid three">
+            <label class="form-field"><span>Jogadores por time</span><input class="input" type="number" name="players_count" value="5" min="3"></label>
+            <label class="form-field"><span>Tolerancia</span><input class="input" type="number" name="tolerance_minutes" value="10" min="0"></label>
+            <label class="form-field"><span>Uniforme preferido</span><input class="input" name="uniform" placeholder="Ex: camisa escura"></label>
+        </div>
+        <label class="form-field"><span>Regras do amistoso</span><textarea class="input" name="rules" placeholder="Ex: dois tempos, sem carrinho, goleiro linha liberado"></textarea></label>
+        <label class="form-field"><span>Observacoes</span><textarea class="input" name="notes" placeholder="Ex: chegar 15 minutos antes"></textarea></label>
+    </div>
+    <div class="form-footer">
+        <a class="btn ghost" href="{{ url_for('challenges.friendlies') }}">Cancelar</a>
+        <button class="btn accent"><i class="bi bi-calendar-plus"></i>Publicar amistoso</button>
+    </div>
+</form>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/courts.js') }}"></script>{% endblock %}

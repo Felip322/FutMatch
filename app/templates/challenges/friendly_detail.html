@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="friendly-detail-hero">
+    <div class="friendly-detail-main">
+        <span class="status-badge status-{{ 'open' if post.status == 'Aberto' else 'requests' if post.status == 'Com solicitacoes' else 'confirmed' if post.status == 'Confirmado' else 'cancelled' if post.status == 'Cancelado' else 'done' if post.status == 'Realizado' else 'review' if post.status == 'Em revisao' else 'neutral' }}">{{ post.status|status_label }}</span>
+        <h1>{{ post.team.name }} busca adversario</h1>
+        <p>{{ post.match_date.strftime("%d/%m/%Y") }} as {{ post.start_time.strftime("%H:%M") }} - {{ post.location_name }} - {{ post.city }}{% if post.neighborhood %}, {{ post.neighborhood }}{% endif %}</p>
+        <div class="friendly-detail-actions">
+            {% if post.status == "Confirmado" %}<a class="btn ghost" href="{{ url_for('challenges.friendly_receipt', id=post.id) }}"><i class="bi bi-file-earmark-check"></i>Comprovante</a>{% endif %}
+            {% if post.court %}<a class="btn ghost" href="{{ url_for('courts.detail', slug=post.court.slug) }}"><i class="bi bi-geo-alt"></i>Ver quadra</a>{% endif %}
+        </div>
+    </div>
+    <div class="match-summary-card">
+        <div class="crest big">{{ post.team.short_name or post.team.name[:2] }}</div>
+        <span>contra</span>
+        {% set accepted = post.requests|selectattr("id", "equalto", post.accepted_request_id)|list|first %}
+        <div class="crest big muted-crest">{{ accepted.requester_team.short_name if accepted else "?" }}</div>
+    </div>
+</section>
+
+<section class="detail-grid">
+    <article class="data-card">
+        <div class="card-title-row"><h2>Local e horário</h2>{% if post.court %}<span class="court-chip"><i class="bi bi-check-circle"></i>Quadra cadastrada</span>{% endif %}</div>
+        <div class="info-list">
+            <p><i class="bi bi-calendar-event"></i><span>{{ post.match_date.strftime("%d/%m/%Y") }} as {{ post.start_time.strftime("%H:%M") }}</span></p>
+            <p><i class="bi bi-geo-alt"></i><span>{{ post.location_name }} - {{ post.address }}{% if post.court and post.court.address_number %}, {{ post.court.address_number }}{% endif %}</span></p>
+            <p><i class="bi bi-map"></i><span>{{ post.city }}{% if post.neighborhood %}, {{ post.neighborhood }}{% endif %} / {{ post.state }}</span></p>
+        </div>
+    </article>
+    <article class="data-card">
+        <h2>Regras combinadas</h2>
+        <div class="info-list">
+            <p><i class="bi bi-people"></i><span>{{ post.players_count }}x{{ post.players_count }}</span></p>
+            <p><i class="bi bi-stopwatch"></i><span>{{ post.duration_minutes }} min, tolerancia {{ post.tolerance_minutes }} min</span></p>
+            <p><i class="bi bi-shirt"></i><span>{{ post.uniform or "Uniforme a combinar" }}</span></p>
+        </div>
+        <p class="muted">{{ post.rules or "Regras padrao de futsal." }}</p>
+        <p class="muted">{{ post.notes or "Sem observacoes adicionais." }}</p>
+    </article>
+</section>
+
+<section class="split-layout">
+    <article class="data-card">
+        <h2>Solicitar amistoso</h2>
+        {% if team and post.team_id != team.id and post.status in ["Aberto", "Com solicitacoes"] and not existing_request %}
+        <div class="invite-preview">
+            <strong>Ao solicitar, seu time confirma:</strong>
+            <span><i class="bi bi-check-circle"></i>Horário do jogo</span>
+            <span><i class="bi bi-check-circle"></i>Local combinado</span>
+            <span><i class="bi bi-check-circle"></i>Uniforme claro, escuro ou a combinar</span>
+        </div>
+        <form method="post" action="{{ url_for('challenges.request_friendly', id=post.id) }}" class="request-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label class="check"><input type="checkbox" name="confirms_time" checked><span>Confirmamos o horário</span></label>
+            <label class="check"><input type="checkbox" name="accepts_location" checked><span>Aceitamos o local</span></label>
+            <label class="form-field"><span>Uniforme do nosso time</span><select class="input" name="uniform_color"><option>Claro</option><option>Escuro</option><option>A combinar</option></select></label>
+            <div class="preset-messages">
+                <button type="button" class="btn ghost" data-message-preset="Confirmamos horário e local. Temos uniforme claro.">Horário + local</button>
+                <button type="button" class="btn ghost" data-message-preset="Temos uniforme escuro e podemos chegar 15 minutos antes.">Uniforme escuro</button>
+                <button type="button" class="btn ghost" data-message-preset="Podemos chegar 15 minutos antes e respeitamos as regras combinadas.">Chegada antecipada</button>
+            </div>
+            <label class="form-field"><span>Observação opcional</span><textarea class="input" name="message" id="request-message" placeholder="Ex: Nosso time confirma esse horário."></textarea></label>
+            <button class="btn accent full"><i class="bi bi-send"></i>Solicitar esse jogo</button>
+        </form>
+        {% elif existing_request %}
+        <div class="empty-state action-empty"><div><i class="bi bi-send-check"></i><h2>Solicitação enviada</h2><p>Status atual: {{ existing_request.status }}</p></div></div>
+        {% elif team and post.team_id == team.id %}
+        <div class="empty-state action-empty"><div><i class="bi bi-shield-check"></i><h2>Este amistoso é do seu time</h2><p>Acompanhe as solicitações recebidas ao lado.</p></div></div>
+        {% else %}
+        <div class="empty-state action-empty"><div><i class="bi bi-info-circle"></i><h2>Solicitação indisponível</h2><p>Verifique o status do amistoso ou crie seu time.</p></div></div>
+        {% endif %}
+    </article>
+    <article class="data-card inbox-card">
+        <div class="card-title-row"><h2>Solicitações recebidas</h2><span class="badge status-blue">{{ post.requests|length }}</span></div>
+        {% for item in post.requests %}
+        <div class="request-row">
+            <div class="inbox-avatar">{{ item.requester_team.short_name or item.requester_team.name[:2] }}</div>
+            <div>
+                <strong>{{ item.requester_team.name }}</strong>
+                <small>{{ item.status }} - horário {{ "ok" if item.confirms_time else "não confirmado" }} - local {{ "ok" if item.accepts_location else "não confirmado" }} - uniforme {{ item.uniform_color or "-" }}</small>
+                {% if item.message %}<p>{{ item.message }}</p>{% endif %}
+                {% if (post.team.owner_id == current_user.id or current_user.is_admin) and item.status == "Pendente" and post.status in ["Aberto", "Com solicitacoes"] %}
+                <div class="actions-inline">
+                    <form method="post" action="{{ url_for('challenges.accept_friendly_request', id=item.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn accent">Aceitar</button></form>
+                    <form method="post" action="{{ url_for('challenges.reject_friendly_request', id=item.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger">Recusar</button></form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}<p class="muted">Nenhum time solicitou este amistoso ainda.</p>{% endfor %}
+    </article>
+</section>
+
+<section class="split-layout">
+    <article class="data-card timeline-card">
+        <h2>Linha do tempo</h2>
+        {% for item in post.history %}
+        <div class="timeline-row"><i></i><span>{{ item.new_status }}</span><small>{{ item.description }} - {{ item.created_at.strftime("%d/%m %H:%M") }}</small></div>
+        {% else %}<p class="muted">Sem histórico ainda.</p>{% endfor %}
+    </article>
+    {% if post.team.owner_id == current_user.id or current_user.is_admin %}
+    <article class="data-card">
+        <h2>Cancelar amistoso</h2>
+        <form method="post" action="{{ url_for('challenges.cancel_friendly', id=post.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label class="form-field"><span>Motivo</span><select class="input" name="reason"><option>falta de jogadores</option><option>problema com quadra</option><option>clima</option><option>imprevisto</option><option>outro</option></select></label>
+            <label class="form-field"><span>Detalhes</span><textarea class="input" name="notes"></textarea></label>
+            <button class="btn danger full">Cancelar com motivo</button>
+        </form>
+    </article>
+    {% endif %}
+</section>
+{% if post.status == "Confirmado" %}
+<section class="data-card whatsapp-card">
+    <div>
+        <h2>Resumo para WhatsApp</h2>
+        <p class="muted">Copie o combinado oficial e envie no grupo do time.</p>
+    </div>
+    {% set combo_text = "Amistoso FutMatch: " ~ post.team.name ~ " x " ~ (accepted.requester_team.name if accepted else "adversário confirmado") ~ " | " ~ post.match_date.strftime('%d/%m/%Y') ~ " às " ~ post.start_time.strftime('%H:%M') ~ " | Local: " ~ post.location_name ~ " - " ~ post.address ~ " | Regras: " ~ post.players_count ~ "x" ~ post.players_count ~ ", " ~ post.duration_minutes ~ " min, tolerância " ~ post.tolerance_minutes ~ " min." %}
+    <div class="actions-inline">
+        <button class="btn accent" data-copy-combo="{{ combo_text }}"><i class="bi bi-whatsapp"></i>Copiar resumo</button>
+        <a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/?text={{ combo_text|urlencode }}"><i class="bi bi-send"></i>Abrir WhatsApp</a>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

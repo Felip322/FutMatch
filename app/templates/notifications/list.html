@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading">
+    <div><p class="eyebrow">Central</p><h1>Notificações</h1><p>Priorize placares pendentes, jogos de hoje e solicitações importantes.</p></div>
+</section>
+<section class="notification-center">
+    {% for title, items, icon in [("Urgente", urgent, "bi-exclamation-triangle"), ("Normal", normal, "bi-bell"), ("Histórico", history, "bi-clock-history")] %}
+    <article class="data-card">
+        <div class="card-title-row"><h2><i class="bi {{ icon }}"></i>{{ title }}</h2><span class="badge">{{ items|length }}</span></div>
+        {% for notification in items %}
+        <a class="list-row {{ 'unread' if not notification.is_read else '' }} {{ 'urgent' if title == 'Urgente' else '' }}" href="{{ url_for('notifications.read', id=notification.id) }}"><span>{{ notification.title }}</span><small>{{ notification.message }} - {{ notification.created_at.strftime("%d/%m %H:%M") }}</small></a>
+        {% else %}<p class="muted">Nada por aqui.</p>{% endfor %}
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}

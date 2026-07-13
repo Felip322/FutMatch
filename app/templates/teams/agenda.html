@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">Agenda</p><h1>{{ team.name }}</h1></div><a class="btn accent" href="{{ url_for('challenges.create_friendly') }}">Publicar amistoso</a></section>
+<section class="dashboard-grid">
+    <article class="data-card stat"><span>Proximos</span><strong>{{ upcoming|length }}</strong></article>
+    <article class="data-card stat"><span>Aguardando</span><strong>{{ pending_posts|length + pending_requests|length }}</strong></article>
+    <article class="data-card stat"><span>Placares</span><strong>{{ pending_results|length }}</strong></article>
+    <article class="data-card stat"><span>Histórico</span><strong>{{ history|length }}</strong></article>
+</section>
+<section class="split-layout">
+    <article class="data-card"><h2>Proximos amistosos</h2>{% for match in upcoming %}<a class="list-row" href="{{ url_for('matches.detail', id=match.id) }}"><span>{{ match.home_team.name }} x {{ match.away_team.name }}</span><small>{{ match.match_date.strftime("%d/%m") }} {{ match.start_time.strftime("%H:%M") }}</small></a>{% else %}<p class="muted">Sem proximos jogos.</p>{% endfor %}</article>
+    <article class="data-card"><h2>Aguardando resposta</h2>{% for post in pending_posts %}<a class="list-row" href="{{ url_for('challenges.friendly_detail', id=post.id) }}"><span>{{ post.location_name }}</span><small>{{ post.status|status_label }} - {{ post.requests|length }} solicitação(ões)</small></a>{% endfor %}{% for req in pending_requests %}<a class="list-row" href="{{ url_for('challenges.friendly_detail', id=req.post.id) }}"><span>{{ req.post.team.name }}</span><small>Solicitação enviada - {{ req.status }}</small></a>{% else %}{% if not pending_posts %}<p class="muted">Nada aguardando resposta.</p>{% endif %}{% endfor %}</article>
+</section>
+<section class="split-layout">
+    <article class="data-card"><h2>Resultados pendentes</h2>{% for match in pending_results %}<a class="list-row" href="{{ url_for('matches.confirm_result', id=match.id) }}"><span>{{ match.home_team.name }} x {{ match.away_team.name }}</span><small>{{ match.result_status }}</small></a>{% else %}<p class="muted">Nenhum resultado pendente.</p>{% endfor %}</article>
+    <article class="data-card"><h2>Histórico</h2>{% for match in history %}<a class="list-row" href="{{ url_for('matches.detail', id=match.id) }}"><span>{{ match.home_team.name }} x {{ match.away_team.name }}</span><small>{{ match.status|status_label }} - {{ match.home_score if match.home_score is not none else "-" }} x {{ match.away_score if match.away_score is not none else "-" }}</small></a>{% else %}<p class="muted">Sem histórico.</p>{% endfor %}</article>
+</section>
+{% endblock %}

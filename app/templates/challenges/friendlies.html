@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading">
+    <div>
+        <p class="eyebrow">Amistosos</p>
+        <h1>Encontre uma partida</h1>
+        <p>Veja datas abertas, filtre por região e solicite o jogo. Quadras cadastradas ficam bloqueadas quando já existe amistoso no mesmo horário.</p>
+    </div>
+    <a class="btn accent" href="{{ url_for('challenges.create_friendly') }}"><i class="bi bi-calendar-plus"></i>Publicar amistoso</a>
+</section>
+<form class="filter-bar sticky-filter">
+    <label><span>Cidade</span><input class="input" name="city" placeholder="São Paulo" value="{{ request.args.get('city','') }}"></label>
+    <label><span>Bairro</span><input class="input" name="neighborhood" placeholder="Pinheiros" value="{{ request.args.get('neighborhood','') }}"></label>
+    <label><span>Data</span><input class="input" type="date" name="date" value="{{ request.args.get('date','') }}"></label>
+    <label><span>Horário</span><input class="input" type="time" name="time" value="{{ request.args.get('time','') }}"></label>
+    <label><span>Status</span><select class="input" name="status">
+        <option value="">Todos</option>
+        {% for status in ["Aberto", "Com solicitacoes", "Confirmado", "Recusado", "Cancelado", "Realizado", "Nao realizado"] %}
+        <option value="{{ status }}" {% if request.args.get('status') == status %}selected{% endif %}>{{ status|status_label }}</option>
+        {% endfor %}
+    </select></label>
+    <button class="btn accent"><i class="bi bi-funnel"></i>Filtrar</button>
+</form>
+{% if not team and not current_user.is_admin %}
+<section class="empty-state"><p>Crie seu time para publicar ou solicitar amistosos.</p><a class="btn accent" href="{{ url_for('teams.create_team') }}">Criar meu time</a></section>
+{% endif %}
+<section class="friendly-grid">
+    {% for post in posts %}
+    <article class="friendly-card">
+        <div class="date-tile"><strong>{{ post.match_date.strftime("%d") }}</strong><span>{{ post.match_date.strftime("%b") }}</span></div>
+        <div class="friendly-card-body">
+            <div class="card-title-row">
+                <div>
+                    <h3>{{ post.team.name }}</h3>
+                    <p>{{ post.start_time.strftime("%H:%M") }} - {{ post.city }}{% if post.neighborhood %}, {{ post.neighborhood }}{% endif %}</p>
+                </div>
+                <span class="status-badge status-{{ 'open' if post.status == 'Aberto' else 'requests' if post.status == 'Com solicitacoes' else 'confirmed' if post.status == 'Confirmado' else 'cancelled' if post.status == 'Cancelado' else 'done' if post.status == 'Realizado' else 'review' if post.status == 'Em revisao' else 'neutral' }}">{{ post.status|status_label }}</span>
+            </div>
+            <div class="friendly-meta">
+                {% for item in post.team_badges %}
+                <span class="mini-badge"><img src="{{ url_for('static', filename='images/badges/' ~ item.badge.icon ~ '.svg') }}" alt="">{{ item.badge.name }}</span>
+                {% endfor %}
+                <span><i class="bi bi-geo-alt"></i>{{ post.location_name }}</span>
+                {% if post.court %}<span class="court-chip"><i class="bi bi-check-circle"></i>Quadra cadastrada</span>{% endif %}
+                {% if post.court and post.court.latitude and post.court.longitude %}<a class="court-chip" href="https://www.google.com/maps?q={{ post.court.latitude }},{{ post.court.longitude }}" target="_blank" rel="noopener"><i class="bi bi-signpost"></i>Ver rota</a>{% endif %}
+                {% if post.distance_km is defined and post.distance_km is not none %}<span><i class="bi bi-compass"></i>{{ post.distance_km }} km da sede</span>{% endif %}
+                <span><i class="bi bi-clock"></i>{{ post.duration_minutes }} min</span>
+                <span><i class="bi bi-people"></i>{{ post.players_count }}x{{ post.players_count }}</span>
+            </div>
+            <div class="team-mini-profile">
+                <span><strong>{{ post.team_card_stats.played }}</strong><small>jogos</small></span>
+                <span><strong>{{ post.team_card_stats.wins }}</strong><small>vitórias</small></span>
+                <span><strong>{{ post.team.fair_play_score }}</strong><small>fair play</small></span>
+                <span><strong>{{ post.team.reliability_score or 0 }}%</strong><small>confiança</small></span>
+                <span><strong>{{ post.team_cancellations }}</strong><small>cancel.</small></span>
+            </div>
+            <a class="btn accent full" href="{{ url_for('challenges.friendly_detail', id=post.id) }}"><i class="bi bi-send"></i>Solicitar esse jogo</a>
+        </div>
+    </article>
+    {% else %}
+    <div class="empty-state">Nenhum amistoso encontrado com esses filtros.</div>
+    {% endfor %}
+</section>
+<section class="data-card friendlies-map-card">
+    <div class="card-title-row"><h2>Mapa de amistosos</h2><span class="badge">Quadras com localização</span></div>
+    <div id="friendlies-map" class="map small-map" data-points='{{ map_points|tojson }}'></div>
+</section>
+<section class="split-layout">
+    <article class="data-card">
+        <h2>Minhas solicitações</h2>
+        {% for item in my_requests %}
+        <a class="list-row row-with-status" href="{{ url_for('challenges.friendly_detail', id=item.post.id) }}"><span>{{ item.post.team.name }}</span><small>{{ item.post.match_date.strftime("%d/%m") }}</small><em class="status-badge status-neutral">{{ item.status }}</em></a>
+        {% else %}<p class="muted">Seu time ainda não solicitou amistosos.</p>{% endfor %}
+    </article>
+    <article class="data-card">
+        <h2>Meus amistosos publicados</h2>
+        {% for post in my_posts %}
+        <a class="list-row row-with-status" href="{{ url_for('challenges.friendly_detail', id=post.id) }}"><span>{{ post.location_name }}</span><small>{{ post.requests|length }} solicitação(ões)</small><em class="status-badge status-{{ 'open' if post.status == 'Aberto' else 'requests' if post.status == 'Com solicitacoes' else 'confirmed' if post.status == 'Confirmado' else 'cancelled' if post.status == 'Cancelado' else 'done' if post.status == 'Realizado' else 'review' if post.status == 'Em revisao' else 'neutral' }}">{{ post.status|status_label }}</em></a>
+        {% else %}<p class="muted">Publique uma data disponível para começar.</p>{% endfor %}
+    </article>
+</section>
+{% endblock %}

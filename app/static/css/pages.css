@@ -1,0 +1,5 @@
+.court-card { overflow: hidden; }
+.unread span { color: var(--accent); }
+.skeleton { position: relative; }
+.skeleton:empty::before { content: ""; display: block; height: 44px; border-radius: var(--radius); background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.12), rgba(255,255,255,.06)); animation: shimmer 1.2s infinite; }
+@keyframes shimmer { 0% { transform: translateX(-8px); opacity: .45; } 50% { opacity: 1; } 100% { transform: translateX(8px); opacity: .45; } }

@@ -1,0 +1,47 @@
+@media (max-width: 920px) {
+    .desktop-nav, .app-sidebar, .global-search { display: none; }
+    .app-authenticated .page-shell { width: min(100% - 32px, 1180px); margin: 0 auto; }
+    .hero, .split-layout, .card-grid.two, .dashboard-main, .detail-grid, .search-grid, .admin-action-grid, .friendly-detail-hero, .feed-layout, .gamification-grid, .ranking-story-grid, .notification-center { grid-template-columns: 1fr; }
+    .steps, .dashboard-grid, .stats-band { grid-template-columns: repeat(2, 1fr); }
+    .form-grid, .form-grid.two, .form-grid.three, .check-grid { grid-template-columns: 1fr; }
+    .page-heading { align-items: flex-start; flex-direction: column; }
+    .team-profile-row { align-items: flex-start; flex-direction: column; }
+    .podium-grid { grid-template-columns: 1fr; }
+    .onboarding-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .mobile-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: grid; grid-template-columns: repeat(5, 1fr); background: rgba(7,17,31,.95); border-top: 1px solid var(--border); backdrop-filter: blur(18px); }
+    .mobile-nav a { display: grid; place-items: center; gap: 4px; padding: 10px 4px; color: var(--text-secondary); font-size: .72rem; text-align: center; }
+    .mobile-nav i { font-size: 1.2rem; color: var(--accent); }
+    .mobile-create i { width: 38px; height: 38px; display: grid; place-items: center; margin-top: -20px; border-radius: 50%; background: var(--accent); color: #07111f; box-shadow: 0 10px 26px rgba(183,255,42,.24); }
+}
+@media (max-width: 680px) {
+    .topbar { padding: 12px 16px; }
+    .brand-logo { width: 122px; }
+    .top-actions .btn.ghost, .top-actions .btn.accent, .user-chip strong { display: none; }
+    .page-shell { width: min(100% - 22px, 1180px); padding-bottom: 108px; }
+    .hero { min-height: auto; padding-top: 24px; }
+    .hero h1 { font-size: 3.1rem; line-height: 1; }
+    .section-title h2, .page-heading h1 { font-size: 2rem; }
+    .match-orbit { min-height: 300px; }
+    .pitch em { font-size: 3.4rem; }
+    .steps, .dashboard-grid, .stats-band { grid-template-columns: 1fr; }
+    .hero-actions, .actions-inline { flex-direction: column; align-items: stretch; }
+    .profile-head, .match-room { align-items: flex-start; flex-direction: column; padding: 20px; }
+    .toast-stack { left: 12px; right: 12px; top: 74px; }
+    .friendly-card { grid-template-columns: 1fr; }
+    .team-mini-profile { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .date-tile { height: auto; min-height: 70px; grid-template-columns: auto auto; gap: 8px; }
+    .sticky-filter { top: 66px; }
+    .form-footer { flex-direction: column-reverse; }
+    .onboarding-strip { grid-template-columns: 1fr; }
+    .friendly-detail-main { min-height: 220px; padding: 20px; }
+    .post-match-strip, .whatsapp-card, .social-post footer { align-items: stretch; flex-direction: column; }
+    .happened-toggle, .score-panel { grid-template-columns: 1fr; }
+    .score-panel > strong { padding: 0; text-align: center; }
+    .feed-composer { position: static; }
+    .calendar-strip { grid-template-columns: repeat(7, 82px); }
+    .moderation-row { flex-direction: column; }
+    .report-row { grid-template-columns: 1fr; }
+    .row-with-status { grid-template-columns: 1fr; }
+    .row-with-status em { grid-column: 1; grid-row: auto; justify-self: flex-start; }
+    .stats-band div, .data-card, .feature-card, .step-card, .team-card, .player-card, .form-card { padding: 16px; }
+}

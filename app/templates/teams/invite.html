@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading">
+    <div>
+        <p class="eyebrow">Convite direto</p>
+        <h1>Convidar {{ target.name }}</h1>
+        <p>Envie um amistoso aberto ou proponha uma nova data, horário e local para o responsável aceitar ou recusar.</p>
+    </div>
+</section>
+<section class="split-layout">
+    <form method="post" class="form-card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="mode" value="existing">
+        <h2>Usar amistoso publicado</h2>
+        {% if my_posts %}
+        <label class="form-field"><span>Amistoso do {{ my_team.name }}</span><select class="input" name="post_id">{% for post in my_posts %}<option value="{{ post.id }}">{{ post.match_date.strftime("%d/%m") }} {{ post.start_time.strftime("%H:%M") }} - {{ post.location_name }}</option>{% endfor %}</select></label>
+        <button class="btn accent full"><i class="bi bi-send"></i>Enviar convite</button>
+        {% else %}
+        <div class="empty-state action-empty"><div><i class="bi bi-calendar-plus"></i><h2>Nenhum amistoso aberto</h2><p>Use a proposta nova ao lado ou publique uma data aberta.</p></div></div>
+        {% endif %}
+    </form>
+    <form method="post" class="form-card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="mode" value="new">
+        <h2>Propor novo amistoso</h2>
+        <div class="form-grid two">
+            <label class="form-field"><span>Data</span><input class="input" type="date" name="match_date" required></label>
+            <label class="form-field"><span>Horário</span><input class="input" type="time" name="start_time" required></label>
+        </div>
+        <label class="form-field"><span>Quadra cadastrada</span><select class="input" name="court_id"><option value="">Usar local manual</option>{% for court in courts %}<option value="{{ court.id }}">{{ court.name }} - {{ court.city }}{% if court.neighborhood %} / {{ court.neighborhood }}{% endif %}</option>{% endfor %}</select></label>
+        <div class="form-grid two">
+            <label class="form-field"><span>Nome do local</span><input class="input" name="location_name" placeholder="Ex: Arena Central"></label>
+            <label class="form-field"><span>Endereco</span><input class="input" name="address"></label>
+            <label class="form-field"><span>Cidade</span><input class="input" name="city" value="{{ my_team.city }}"></label>
+            <label class="form-field"><span>Estado</span><input class="input" name="state" value="{{ my_team.state }}" maxlength="2"></label>
+            <label class="form-field"><span>Bairro</span><input class="input" name="neighborhood" value="{{ my_team.neighborhood or '' }}"></label>
+        </div>
+        <label class="form-field"><span>Mensagem</span><textarea class="input" name="message" placeholder="Ex: Podemos jogar neste horário?"></textarea></label>
+        <button class="btn accent full"><i class="bi bi-send"></i>Enviar proposta direta</button>
+    </form>
+</section>
+{% endblock %}

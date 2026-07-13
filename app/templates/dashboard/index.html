@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading compact-heading">
+    <div>
+        <p class="eyebrow">Dashboard</p>
+        <h1>{{ teams[0].name if teams else "Boa partida, " ~ current_user.display_name }}.</h1>
+        <p>Acompanhe próximos jogos, solicitações recebidas, placares pendentes e notificações importantes.</p>
+    </div>
+    <div class="actions-inline">
+        <a class="btn accent" href="{{ url_for('challenges.create_friendly') }}"><i class="bi bi-calendar-plus"></i>Publicar amistoso</a>
+        <a class="btn ghost" href="{{ url_for('teams.create_team') }}"><i class="bi bi-shield-plus"></i>Meu time</a>
+    </div>
+</section>
+<section class="onboarding-strip">
+    <a class="onboarding-step {{ 'done' if teams else 'active' }}" href="{{ url_for('teams.create_team') }}">
+        <i class="bi {{ 'bi-check-circle-fill' if teams else 'bi-1-circle' }}"></i>
+        <span><strong>Criar time</strong><small>{{ "Concluído" if teams else "Primeiro passo" }}</small></span>
+    </a>
+    <a class="onboarding-step {{ 'done' if teams else '' }} {{ 'active' if teams and not friendly_posts else '' }}" href="{{ url_for('courts.create_court') }}">
+        <i class="bi bi-geo-alt"></i>
+        <span><strong>Cadastrar quadra</strong><small>Opcional, mas recomendado</small></span>
+    </a>
+    <a class="onboarding-step {{ 'done' if friendly_posts else '' }} {{ 'active' if teams and not friendly_posts else '' }}" href="{{ url_for('challenges.create_friendly') }}">
+        <i class="bi {{ 'bi-check-circle-fill' if friendly_posts else 'bi-calendar-plus' }}"></i>
+        <span><strong>Publicar amistoso</strong><small>{{ "Publicado" if friendly_posts else "Receba solicitações" }}</small></span>
+    </a>
+    <a class="onboarding-step {{ 'active' if pending_results else '' }}" href="{{ url_for('matches.pending_results') }}">
+        <i class="bi bi-clipboard-check"></i>
+        <span><strong>Confirmar placar</strong><small>{{ pending_results|length }} pendente(s)</small></span>
+    </a>
+</section>
+<section class="dashboard-grid compact-stats">
+    <article class="data-card stat mini"><span>{{ "Equipes" if current_user.is_admin else "Meu time" }}</span><strong>{{ teams|length }}</strong><p>{{ "Todos os times" if current_user.is_admin else "Limite atual: 1 time" }}</p></article>
+    <article class="data-card stat mini"><span>Solicitações</span><strong>{{ friendly_requests|length }}</strong><p>Times interessados</p></article>
+    <article class="data-card stat mini"><span>Jogos</span><strong>{{ matches|length }}</strong><p>Confirmados</p></article>
+    <article class="data-card stat mini"><span>Placares</span><strong>{{ pending_results|length }}</strong><p>Pendentes</p></article>
+</section>
+<section class="dashboard-main">
+    <article class="next-match-card">
+        <div>
+            <p class="eyebrow">Próximo jogo</p>
+            {% set next_match = matches[0] if matches else none %}
+            {% if next_match %}
+            <h2>{{ next_match.home_team.name }} x {{ next_match.away_team.name }}</h2>
+            <p>{{ next_match.match_date.strftime("%d/%m/%Y") }} às {{ next_match.start_time.strftime("%H:%M") }}{% if next_match.court %} - {{ next_match.court.name }}{% endif %}</p>
+            <a class="btn accent" href="{{ url_for('matches.detail', id=next_match.id) }}"><i class="bi bi-eye"></i>Ver partida</a>
+            {% else %}
+            <h2>Nenhum jogo confirmado</h2>
+            <p>Publique uma data para receber solicitações de adversários.</p>
+            <a class="btn accent" href="{{ url_for('challenges.create_friendly') }}"><i class="bi bi-calendar-plus"></i>Publicar amistoso</a>
+            {% endif %}
+        </div>
+        <div class="next-match-date">
+            {% if next_match %}<strong>{{ next_match.match_date.strftime("%d") }}</strong><span>{{ next_match.match_date.strftime("%m/%Y") }}</span>{% else %}<strong>+</strong><span>novo</span>{% endif %}
+        </div>
+    </article>
+    <article class="data-card inbox-card">
+        <div class="card-title-row"><h2>Solicitações recebidas</h2><span class="badge status-blue">{{ friendly_requests|length }}</span></div>
+        {% for item in friendly_requests %}
+        <a class="inbox-row" href="{{ url_for('challenges.friendly_detail', id=item.post.id) }}">
+            <span class="inbox-avatar">{{ item.requester_team.short_name or item.requester_team.name[:2] }}</span>
+            <span><strong>{{ item.requester_team.name }}</strong><small>{{ item.status }} - {{ item.post.match_date.strftime("%d/%m") }}</small></span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        {% else %}<p class="muted">Nenhum time solicitou ainda.</p>{% endfor %}
+    </article>
+</section>
+{% if pending_results %}
+<section class="post-match-strip">
+    <div>
+        <p class="eyebrow">Pós-jogo</p>
+        <h2>O jogo aconteceu?</h2>
+        <p>Você tem {{ pending_results|length }} placar pendente. Confirme o resultado para atualizar campanha, ranking e histórico.</p>
+    </div>
+    <a class="btn accent" href="{{ url_for('matches.confirm_result', id=pending_results[0].id) }}"><i class="bi bi-clipboard-check"></i>Confirmar agora</a>
+</section>
+{% endif %}
+<section class="split-layout">
+    <article class="data-card activity-card">
+        <div class="card-title-row"><h2>Movimento da comunidade</h2><a class="btn ghost" href="{{ url_for('feed.feed') }}">Ver feed</a></div>
+        {% for item in activity_items %}
+        <a class="activity-row" href="{{ item.link }}"><i class="bi {{ item.icon }}"></i><span><strong>{{ item.title }}</strong><small>{{ item.text }}</small></span></a>
+        {% else %}<p class="muted">A comunidade ainda está quieta. Publique um amistoso ou um post do seu time.</p>{% endfor %}
+    </article>
+    <article class="data-card weekly-card">
+        <h2>Agenda da semana</h2>
+        <div class="calendar-strip">
+            {% for day in calendar_days %}
+            <a class="calendar-day {{ 'today' if loop.index0 == 0 else '' }} {{ 'has-match' if day.matches else '' }}" href="{{ url_for('matches.detail', id=day.matches[0].id) if day.matches else '#' }}">
+                <span>{{ day.label }}</span>
+                <strong>{{ day.date.strftime("%d") }}</strong>
+                <small>{{ day.matches|length }} jogo(s)</small>
+            </a>
+            {% endfor %}
+        </div>
+        {% for match in week_matches %}
+        <a class="week-row" href="{{ url_for('matches.detail', id=match.id) }}"><span><strong>{{ match.match_date.strftime("%d/%m") }}</strong><small>{{ match.start_time.strftime("%H:%M") }}</small></span><p>{{ match.home_team.name }} x {{ match.away_team.name }}</p></a>
+        {% else %}<p class="muted">Nenhum jogo nos próximos 7 dias.</p>{% endfor %}
+    </article>
+</section>
+<section class="split-layout">
+    <article class="data-card">
+        <h2>Meus amistosos publicados</h2>
+        {% for post in friendly_posts %}
+        <a class="list-row row-with-status" href="{{ url_for('challenges.friendly_detail', id=post.id) }}"><span>{{ post.team.name }}</span><small>{{ post.match_date.strftime("%d/%m") }} {{ post.start_time.strftime("%H:%M") }} - {{ post.location_name }}</small><em class="status-badge status-{{ 'open' if post.status == 'Aberto' else 'requests' if post.status == 'Com solicitacoes' else 'confirmed' if post.status == 'Confirmado' else 'cancelled' if post.status == 'Cancelado' else 'done' if post.status == 'Realizado' else 'review' if post.status == 'Em revisao' else 'neutral' }}">{{ post.status|status_label }}</em></a>
+        {% else %}<p class="muted">Publique uma data disponível para receber solicitações.</p>{% endfor %}
+    </article>
+    <article class="data-card">
+        <h2>Notificações por prioridade</h2>
+        <div class="notification-groups">
+            <div><strong>Urgente</strong>{% for notification in urgent_notifications %}<a class="list-row urgent" href="{{ notification.link or '#' }}"><span>{{ notification.title }}</span><small>{{ notification.message }}</small></a>{% else %}<p class="muted">Nada urgente.</p>{% endfor %}</div>
+            <div><strong>Normal</strong>{% for notification in normal_notifications %}<a class="list-row" href="{{ notification.link or '#' }}"><span>{{ notification.title }}</span><small>{{ notification.message }}</small></a>{% else %}<p class="muted">Sem novidades.</p>{% endfor %}</div>
+            <div><strong>Histórico</strong>{% for notification in history_notifications %}<a class="list-row" href="{{ notification.link or '#' }}"><span>{{ notification.title }}</span><small>{{ notification.message }}</small></a>{% else %}<p class="muted">Sem histórico recente.</p>{% endfor %}</div>
+        </div>
+    </article>
+</section>
+<section class="split-layout">
+    <article class="data-card">
+        <h2>Placares pendentes</h2>
+        {% for match in pending_results %}
+        <a class="list-row" href="{{ url_for('matches.confirm_result', id=match.id) }}"><span>{{ match.home_team.name }} x {{ match.away_team.name }}</span><small>Informe se o jogo aconteceu e o placar</small></a>
+        {% else %}<p class="muted">Nenhum placar pendente.</p>{% endfor %}
+    </article>
+</section>
+{% endblock %}

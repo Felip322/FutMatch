@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-head">
+    {% if court.cover_image %}<img class="court-cover-thumb" src="{{ url_for('static', filename=court.cover_image) }}" alt="{{ court.name }}">{% else %}<div class="court-logo"><i class="bi bi-geo-alt"></i></div>{% endif %}
+    <div>
+        <p class="eyebrow">Quadra pública</p>
+        <h1>{{ court.name }}</h1>
+        <p>{{ court.address }}{% if court.address_number %}, {{ court.address_number }}{% endif %} - {{ court.city }}{% if court.neighborhood %}, {{ court.neighborhood }}{% endif %}</p>
+    </div>
+    <a class="btn accent" href="{{ url_for('auth.register') if not current_user.is_authenticated else url_for('challenges.create_friendly') }}">Usar em amistoso</a>
+</section>
+<section class="split-layout">
+    <div id="map" class="map" data-lat="{{ court.latitude or -23.5505 }}" data-lng="{{ court.longitude or -46.6333 }}"></div>
+    <article class="data-card">
+        <h2>Estrutura</h2>
+        <p>{{ court.description or "Quadra cadastrada para amistosos." }}</p>
+        <p>{{ court.floor_type }} - {{ "Coberta" if court.is_covered else "Descoberta" }}</p>
+        <p>{{ "Estacionamento" if court.parking else "Sem estacionamento" }} - {{ "Vestiario" if court.locker_room else "Sem vestiario" }}</p>
+        {% if court.latitude and court.longitude %}<a class="btn ghost full" target="_blank" rel="noopener" href="https://www.google.com/maps?q={{ court.latitude }},{{ court.longitude }}">Ver rota</a>{% endif %}
+    </article>
+</section>
+{% endblock %}
