@@ -68,7 +68,9 @@
     </article>
     <article class="data-card">
         <h2>Resultado</h2>
-        {% if match.home_score is none and match.away_score is none %}
+        {% if match.status == "Cancelado" %}
+        <p class="muted">Partida cancelada. O motivo fica registrado no resumo.</p>
+        {% elif match.home_score is none and match.away_score is none %}
         <p class="muted">Depois da data do jogo, os responsaveis recebem uma notificacao para informar se aconteceu e qual foi o placar.</p>
         <a class="btn accent full" href="{{ url_for('matches.confirm_result', id=match.id) }}">Confirmar jogo e placar</a>
         {% else %}
@@ -77,4 +79,18 @@
         {% endif %}
     </article>
 </section>
+{% if match.status not in ["Finalizado", "Cancelado", "Nao realizado"] %}
+<section class="data-card cancel-match-card">
+    <div>
+        <h2>Cancelar partida</h2>
+        <p class="muted">Use essa ação se o jogo confirmado não vai acontecer. O motivo fica registrado para os dois times.</p>
+    </div>
+    <form method="post" action="/matches/{{ match.id }}/cancel" class="cancel-match-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label class="form-field"><span>Motivo</span><select class="input" name="reason"><option>falta de jogadores</option><option>problema com quadra</option><option>clima</option><option>imprevisto</option><option>outro</option></select></label>
+        <label class="form-field"><span>Detalhes</span><textarea class="input" name="notes" placeholder="Ex: adversário avisado com antecedência"></textarea></label>
+        <button class="btn danger" type="submit">Cancelar partida</button>
+    </form>
+</section>
+{% endif %}
 {% endblock %}

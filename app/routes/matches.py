@@ -104,6 +104,41 @@ def update_uniform(id):
     return redirect(url_for("matches.detail", id=match.id))
 
 
+@matches_bp.route("/matches/<int:id>/cancel", methods=["POST"])
+@login_required
+def cancel_match(id):
+    match = Match.query.get_or_404(id)
+    if not can_access_match(match):
+        return render_template("errors/403.html"), 403
+    if match.status in ["Finalizado", "Cancelado", "Nao realizado"]:
+        flash("Essa partida nao pode mais ser cancelada por aqui.", "warning")
+        return redirect(url_for("matches.detail", id=match.id))
+    reason = request.form.get("reason") or "outro"
+    notes = (request.form.get("notes") or "").strip()
+    detail = f"Partida cancelada. Motivo: {reason}."
+    if notes:
+        detail = f"{detail} {notes}"
+    match.status = "Cancelado"
+    match.result_status = "Cancelado"
+    match.notes = detail
+    post = friendly_post_for_match(match)
+    if post:
+        post.status = "Cancelado"
+        post.cancellation_reason = reason
+        post.cancellation_notes = notes
+    team_ids = owned_team_ids()
+    cancelled_by_home = match.home_team_id in team_ids
+    if current_user.is_admin:
+        notify(match.home_team.owner_id, "Partida cancelada", detail, "amistoso_cancelado", url_for("matches.detail", id=match.id))
+        notify(match.away_team.owner_id, "Partida cancelada", detail, "amistoso_cancelado", url_for("matches.detail", id=match.id))
+    else:
+        other_owner = match.away_team.owner_id if cancelled_by_home else match.home_team.owner_id
+        notify(other_owner, "Partida cancelada", detail, "amistoso_cancelado", url_for("matches.detail", id=match.id))
+    db.session.commit()
+    flash("Partida cancelada com motivo registrado.", "info")
+    return redirect(url_for("matches.detail", id=match.id))
+
+
 @matches_bp.route("/matches/<int:id>/confirm-result", methods=["GET", "POST"])
 @login_required
 def confirm_result(id):
