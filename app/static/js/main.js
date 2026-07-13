@@ -38,6 +38,35 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => toast.remove(), 4200);
     });
 
+    document.querySelectorAll(".media-edit-card input[type='file']").forEach((input) => {
+        input.addEventListener("change", () => {
+            const file = input.files && input.files[0];
+            if (!file || !file.type.startsWith("image/")) return;
+            const card = input.closest(".media-edit-card");
+            if (!card) return;
+            const currentPreview = card.querySelector(".media-edit-preview, .media-edit-placeholder");
+            const preview = currentPreview?.tagName === "IMG" ? currentPreview : document.createElement("img");
+            preview.className = `media-edit-preview ${input.name === "logo" ? "logo-preview" : "banner-preview"}`;
+            preview.alt = "Prévia da imagem selecionada";
+            const objectUrl = URL.createObjectURL(file);
+            preview.src = objectUrl;
+            preview.onload = () => URL.revokeObjectURL(objectUrl);
+            if (currentPreview && currentPreview !== preview) {
+                currentPreview.replaceWith(preview);
+            } else if (!currentPreview) {
+                card.insertBefore(preview, input);
+            }
+            const note = card.querySelector("small");
+            if (note) {
+                note.textContent = "Prévia da nova imagem";
+            } else {
+                const small = document.createElement("small");
+                small.textContent = "Prévia da nova imagem";
+                card.insertBefore(small, input);
+            }
+        });
+    });
+
     document.querySelectorAll("[data-achievement-overlay]").forEach((overlay) => {
         const close = () => {
             overlay.classList.add("closing");
