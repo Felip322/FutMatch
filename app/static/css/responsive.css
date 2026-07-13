@@ -1,7 +1,7 @@
 @media (max-width: 920px) {
     .desktop-nav, .app-sidebar, .global-search { display: none; }
     .app-authenticated .page-shell { width: min(100% - 32px, 1180px); margin: 0 auto; }
-    .hero, .split-layout, .card-grid.two, .dashboard-main, .detail-grid, .search-grid, .admin-action-grid, .friendly-detail-hero, .feed-layout, .gamification-grid, .ranking-story-grid, .notification-center, .match-team-summary-grid { grid-template-columns: 1fr; }
+    .hero, .split-layout, .card-grid.two, .dashboard-main, .detail-grid, .search-grid, .admin-action-grid, .friendly-detail-hero, .feed-layout, .gamification-grid, .ranking-story-grid, .notification-center, .match-team-summary-grid, .match-content-grid, .match-quick-grid { grid-template-columns: 1fr; }
     .cancel-match-card { grid-template-columns: 1fr; }
     .steps, .dashboard-grid, .stats-band { grid-template-columns: repeat(2, 1fr); }
     .form-grid, .form-grid.two, .form-grid.three, .check-grid, .media-edit-grid { grid-template-columns: 1fr; }
@@ -27,6 +27,9 @@
     .steps, .dashboard-grid, .stats-band { grid-template-columns: 1fr; }
     .hero-actions, .actions-inline { flex-direction: column; align-items: stretch; }
     .profile-head, .match-room { align-items: flex-start; flex-direction: column; padding: 20px; }
+    .match-score-panel { width: 100%; min-width: 0; }
+    .match-room-meta span { width: 100%; border-radius: var(--radius); }
+    .match-team-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .toast-stack { left: 12px; right: 12px; top: 74px; }
     .friendly-card-head { grid-template-columns: 68px minmax(0, 1fr); align-items: flex-start; }
     .friendly-card-head .status-badge { grid-column: 2; justify-self: flex-start; }

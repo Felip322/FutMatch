@@ -1,22 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="match-room">
-    <div>
-        <p class="eyebrow">Amistoso {{ match.status }}</p>
-        <h1>{{ match.home_team.name }} x {{ match.away_team.name }}</h1>
-        <p>{{ match.match_date.strftime("%d/%m/%Y") }} as {{ match.start_time.strftime("%H:%M") }}</p>
-    </div>
-    <div class="scoreboard">{{ match.home_score if match.home_score is not none else "-" }} x {{ match.away_score if match.away_score is not none else "-" }}</div>
-</section>
 {% set post = match.friendly_post %}
-<section class="detail-grid">
-    <article class="data-card">
+<section class="match-room match-room-pro">
+    <div class="match-room-main">
+        <span class="status-badge status-{{ 'confirmed' if match.status == 'Confirmado' else 'cancelled' if match.status == 'Cancelado' else 'done' if match.status == 'Finalizado' else 'review' if match.status == 'Em revisao' else 'neutral' }}">{{ match.status }}</span>
+        <div class="match-room-teams">
+            <span>{{ match.home_team.name }}</span>
+            <strong>x</strong>
+            <span>{{ match.away_team.name }}</span>
+        </div>
+        <div class="match-room-meta">
+            <span><i class="bi bi-calendar-event"></i>{{ match.match_date.strftime("%d/%m/%Y") }} às {{ match.start_time.strftime("%H:%M") }}</span>
+            {% if post %}
+            <span><i class="bi bi-geo-alt"></i>{{ post.location_name }}{% if post.neighborhood %} - {{ post.neighborhood }}{% endif %}</span>
+            {% elif match.court %}
+            <span><i class="bi bi-geo-alt"></i>{{ match.court.name }}</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="match-score-panel">
+        <small>Placar</small>
+        <div class="scoreboard">{{ match.home_score if match.home_score is not none else "-" }} x {{ match.away_score if match.away_score is not none else "-" }}</div>
+        <span>{{ match.result_status }}</span>
+    </div>
+</section>
+
+<section class="match-quick-grid">
+    <article class="data-card match-info-card">
         <div class="card-title-row">
             <h2>Local e horário</h2>
             {% if match.court %}<span class="court-chip"><i class="bi bi-check-circle"></i>Quadra cadastrada</span>{% endif %}
         </div>
         <div class="info-list">
-            <p><i class="bi bi-calendar-event"></i><span>{{ match.match_date.strftime("%d/%m/%Y") }} as {{ match.start_time.strftime("%H:%M") }}</span></p>
+            <p><i class="bi bi-calendar-event"></i><span>{{ match.match_date.strftime("%d/%m/%Y") }} às {{ match.start_time.strftime("%H:%M") }}</span></p>
             {% if post %}
             <p><i class="bi bi-geo-alt"></i><span>{{ post.location_name }} - {{ post.address }}{% if post.court and post.court.address_number %}, {{ post.court.address_number }}{% endif %}</span></p>
             <p><i class="bi bi-map"></i><span>{{ post.city }}{% if post.neighborhood %}, {{ post.neighborhood }}{% endif %} / {{ post.state }}</span></p>
@@ -28,7 +44,8 @@
             {% endif %}
         </div>
     </article>
-    <article class="data-card">
+
+    <article class="data-card match-info-card">
         <h2>Regras combinadas</h2>
         <div class="info-list">
             {% if post %}
@@ -50,9 +67,16 @@
         {% endif %}
     </article>
 </section>
-<section class="split-layout">
-    <article class="data-card">
-        <h2>Resumo</h2>
+
+<section class="match-content-grid">
+    <article class="data-card match-compare-card">
+        <div class="card-title-row">
+            <div>
+                <p class="eyebrow">Comparativo</p>
+                <h2>Resumo dos times</h2>
+            </div>
+            <span class="badge status-blue">{{ match.status }}</span>
+        </div>
         <div class="match-team-summary-grid">
             <div class="match-team-summary">
                 <div class="match-team-title">
@@ -75,6 +99,7 @@
                     <span><strong>{{ home_stats.performance }}%</strong><small>Aproveit.</small></span>
                 </div>
             </div>
+
             <div class="match-team-summary">
                 <div class="match-team-title">
                     <span>Visitante</span>
@@ -97,30 +122,47 @@
                 </div>
             </div>
         </div>
-        <p><strong>Status:</strong> {{ match.status }}</p>
-        <p><strong>Resultado:</strong> {{ match.result_status }}</p>
-        <p>{{ match.notes or "Amistoso confirmado entre os responsáveis dos times." }}</p>
-        <h3>Confirmacoes</h3>
-        {% for item in match.confirmations %}
-        <p>{{ item.team.name }}: {{ "realizado" if item.happened else "não realizado" }}{% if item.happened %} - {{ item.home_score }} x {{ item.away_score }}{% endif %}</p>
-        {% if item.proof_image %}<img class="proof-image" src="{{ url_for('static', filename=item.proof_image) }}" alt="Comprovante enviado por {{ item.team.name }}">{% endif %}
-        {% else %}<p class="muted">Nenhum time confirmou ainda.</p>{% endfor %}
+        <div class="match-note-box">
+            <strong>Resumo oficial</strong>
+            <p>{{ match.notes or "Amistoso confirmado entre os responsáveis dos times." }}</p>
+        </div>
     </article>
-    <article class="data-card">
-        <h2>Resultado</h2>
-        {% if match.status == "Cancelado" %}
-        <p class="muted">Partida cancelada. O motivo fica registrado no resumo.</p>
-        {% elif match.home_score is none and match.away_score is none and can_confirm_result %}
-        <p class="muted">Depois da data do jogo, os responsaveis recebem uma notificacao para informar se aconteceu e qual foi o placar.</p>
-        <a class="btn accent full" href="{{ url_for('matches.confirm_result', id=match.id) }}">Confirmar jogo e placar</a>
-        {% elif match.home_score is none and match.away_score is none %}
-        <p class="muted">A confirmação de placar fica disponível após a data do jogo: {{ match.match_date.strftime("%d/%m/%Y") }}.</p>
-        {% else %}
-        <p>Placar registrado e estatisticas salvas.</p>
-        <a class="btn ghost full" href="{{ url_for('matches.simple_review', id=match.id) }}">Avaliar fair play</a>
-        {% endif %}
-    </article>
+
+    <aside class="match-side-column">
+        <article class="data-card result-card">
+            <div class="card-title-row">
+                <h2>Resultado</h2>
+                <span class="badge">{{ match.result_status }}</span>
+            </div>
+            {% if match.status == "Cancelado" %}
+            <p class="muted">Partida cancelada. O motivo fica registrado no resumo.</p>
+            {% elif match.home_score is none and match.away_score is none and can_confirm_result %}
+            <p class="muted">Depois da data do jogo, os responsáveis recebem uma notificação para informar se aconteceu e qual foi o placar.</p>
+            <a class="btn accent full" href="{{ url_for('matches.confirm_result', id=match.id) }}">Confirmar jogo e placar</a>
+            {% elif match.home_score is none and match.away_score is none %}
+            <p class="muted">A confirmação de placar fica disponível após a data do jogo: {{ match.match_date.strftime("%d/%m/%Y") }}.</p>
+            {% else %}
+            <p>Placar registrado e estatísticas salvas.</p>
+            <a class="btn ghost full" href="{{ url_for('matches.simple_review', id=match.id) }}">Avaliar fair play</a>
+            {% endif %}
+        </article>
+
+        <article class="data-card confirmations-card">
+            <div class="card-title-row">
+                <h2>Confirmações</h2>
+                <span class="badge status-blue">{{ match.confirmations|length }}</span>
+            </div>
+            {% for item in match.confirmations %}
+            <div class="confirmation-row">
+                <strong>{{ item.team.name }}</strong>
+                <span>{{ "Realizado" if item.happened else "Não realizado" }}{% if item.happened %} - {{ item.home_score }} x {{ item.away_score }}{% endif %}</span>
+            </div>
+            {% if item.proof_image %}<img class="proof-image" src="{{ url_for('static', filename=item.proof_image) }}" alt="Comprovante enviado por {{ item.team.name }}">{% endif %}
+            {% else %}<p class="muted">Nenhum time confirmou ainda.</p>{% endfor %}
+        </article>
+    </aside>
 </section>
+
 {% if match.status not in ["Finalizado", "Cancelado", "Nao realizado"] %}
 <section class="data-card cancel-match-card">
     <div>
