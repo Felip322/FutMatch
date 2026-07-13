@@ -26,7 +26,10 @@ def dashboard():
     normal_notifications = [item for item in notifications if item.notification_type in ("amistoso_solicitado", "amistoso_confirmado", "amistoso_recusado", "jogo_amanha")]
     history_notifications = [item for item in notifications if item not in urgent_notifications and item not in normal_notifications]
     friendly_posts = FriendlyMatchPost.query.filter(FriendlyMatchPost.team_id.in_(team_ids)).order_by(FriendlyMatchPost.created_at.desc()).limit(5).all() if team_ids else []
-    friendly_requests = FriendlyMatchRequest.query.join(FriendlyMatchPost).filter(FriendlyMatchPost.team_id.in_(team_ids)).order_by(FriendlyMatchRequest.created_at.desc()).limit(8).all() if team_ids else []
+    friendly_requests = FriendlyMatchRequest.query.join(FriendlyMatchPost).filter(
+        FriendlyMatchPost.team_id.in_(team_ids),
+        FriendlyMatchRequest.status == "Pendente",
+    ).order_by(FriendlyMatchRequest.created_at.desc()).limit(8).all() if team_ids else []
     sent_friendly_requests = FriendlyMatchRequest.query.filter(FriendlyMatchRequest.requester_team_id.in_(team_ids)).order_by(FriendlyMatchRequest.created_at.desc()).limit(5).all() if team_ids else []
     pending_results = Match.query.filter(Match.match_date <= date.today(), Match.home_score.is_(None), Match.away_score.is_(None))
     if not current_user.is_admin:

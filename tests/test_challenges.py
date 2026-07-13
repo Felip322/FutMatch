@@ -181,6 +181,51 @@ def test_confirmed_friendly_detail_redirects_to_match_room():
     assert response.headers["Location"].endswith(f"/matches/{match_id}")
 
 
+def test_dashboard_received_requests_only_shows_pending_items():
+    app = create_app(TestConfig)
+    with app.app_context():
+        owner = User(name="Dono", email="dashboard-owner@example.com", city="Sao Paulo", state="SP")
+        pending_owner = User(name="Pendente", email="dashboard-pending@example.com", city="Sao Paulo", state="SP")
+        accepted_owner = User(name="Aceito", email="dashboard-accepted@example.com", city="Sao Paulo", state="SP")
+        for user in (owner, pending_owner, accepted_owner):
+            user.set_password("Senha123!")
+        db.session.add_all([owner, pending_owner, accepted_owner])
+        db.session.flush()
+        home = Team(name="DASH CASA", slug="dash-casa", city="Sao Paulo", state="SP", owner_id=owner.id)
+        pending_team = Team(name="TIME PENDENTE DASH", slug="time-pendente-dash", city="Sao Paulo", state="SP", owner_id=pending_owner.id)
+        accepted_team = Team(name="TIME ACEITO DASH", slug="time-aceito-dash", city="Sao Paulo", state="SP", owner_id=accepted_owner.id)
+        db.session.add_all([home, pending_team, accepted_team])
+        db.session.flush()
+        post = FriendlyMatchPost(
+            team_id=home.id,
+            match_date=date.today(),
+            start_time=time(20),
+            location_name="Quadra Teste",
+            address="Rua Teste, 10",
+            city="Sao Paulo",
+            state="SP",
+        )
+        db.session.add(post)
+        db.session.flush()
+        db.session.add_all([
+            FriendlyMatchRequest(post_id=post.id, requester_team_id=pending_team.id, status="Pendente"),
+            FriendlyMatchRequest(post_id=post.id, requester_team_id=accepted_team.id, status="Aceita"),
+        ])
+        db.session.commit()
+        owner_id = owner.id
+
+    client = app.test_client()
+    with client.session_transaction() as session:
+        session["_user_id"] = str(owner_id)
+
+    response = client.get("/dashboard")
+    body = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert "TIME PENDENTE DASH" in body
+    assert "TIME ACEITO DASH" not in body
+
+
 def test_future_match_cannot_confirm_score():
     app = create_app(TestConfig)
     with app.app_context():

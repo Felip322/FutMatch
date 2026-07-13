@@ -208,6 +208,11 @@ td, th { text-align: left; padding: 12px; border-bottom: 1px solid var(--border)
 .match-team-stats span { display: grid; place-items: center; min-height: 58px; padding: 8px 4px; border-radius: 10px; background: rgba(4,10,20,.46); border: 1px solid rgba(255,255,255,.07); text-align: center; }
 .match-team-stats strong { color: var(--accent); font: 900 1.05rem/1 var(--font-heading); }
 .match-team-stats small { margin-top: 5px; color: var(--text-secondary); font-size: .66rem; font-weight: 900; line-height: 1.05; text-transform: uppercase; }
+.accepted-request-summary { display: grid; gap: 8px; margin-top: 14px; padding: 12px; border: 1px solid rgba(183,255,42,.22); border-radius: var(--radius); background: rgba(183,255,42,.055); color: var(--text-secondary); }
+.accepted-request-summary strong { color: var(--text-primary); }
+.accepted-request-summary span { display: flex; align-items: center; gap: 8px; }
+.accepted-request-summary i { color: var(--accent); }
+.accepted-request-summary p { margin: 4px 0 0; }
 .cancel-match-card { display: grid; grid-template-columns: minmax(0, .7fr) minmax(320px, 1fr); gap: 18px; align-items: start; margin-top: 22px; border-color: rgba(255,77,94,.26); }
 .cancel-match-form { display: grid; gap: 10px; }
 .cancel-match-form .form-field { margin-bottom: 0; }

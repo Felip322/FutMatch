@@ -40,6 +40,14 @@
             <p><i class="bi bi-card-text"></i><span>{{ match.notes or "Amistoso confirmado entre os responsáveis dos times." }}</span></p>
             {% endif %}
         </div>
+        {% if match.accepted_request %}
+        <div class="accepted-request-summary">
+            <strong>Solicitação aceita de {{ match.away_team.name }}</strong>
+            <span><i class="bi {{ 'bi-check-circle-fill' if match.accepted_request.confirms_time else 'bi-x-circle' }}"></i>{{ "Horário confirmado" if match.accepted_request.confirms_time else "Horário não confirmado" }}</span>
+            <span><i class="bi {{ 'bi-check-circle-fill' if match.accepted_request.accepts_location else 'bi-x-circle' }}"></i>{{ "Local aceito" if match.accepted_request.accepts_location else "Local não confirmado" }}</span>
+            {% if match.accepted_request.message %}<p>{{ match.accepted_request.message }}</p>{% endif %}
+        </div>
+        {% endif %}
     </article>
 </section>
 <section class="split-layout">
