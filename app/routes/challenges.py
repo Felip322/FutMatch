@@ -236,6 +236,19 @@ def request_friendly(id):
     return redirect(url_for("challenges.friendlies"))
 
 
+@challenges_bp.route("/friendlies/<int:id>/uniform", methods=["POST"])
+@login_required
+def update_friendly_uniform(id):
+    post = FriendlyMatchPost.query.get_or_404(id)
+    if post.team.owner_id != current_user.id and not current_user.is_admin:
+        return render_template("errors/403.html"), 403
+    post.uniform = build_uniform_description(request.form)
+    add_friendly_history(post, post.status, "Uniforme do time mandante atualizado.", post.status)
+    db.session.commit()
+    flash("Uniforme do amistoso atualizado.", "success")
+    return redirect(url_for("challenges.friendly_detail", id=post.id))
+
+
 @challenges_bp.route("/friendlies/requests/<int:id>/accept", methods=["POST"])
 @login_required
 def accept_friendly_request(id):

@@ -32,19 +32,42 @@
         <div class="info-list">
             <p><i class="bi bi-people"></i><span>{{ post.players_count }}x{{ post.players_count }}</span></p>
             <p><i class="bi bi-stopwatch"></i><span>{{ post.duration_minutes }} min, tolerancia {{ post.tolerance_minutes }} min</span></p>
-            <div class="info-list-row">
+            <div class="info-list-row uniform-owner-row">
                 <i class="bi bi-shirt"></i>
-                {% if post.uniform_parts %}
-                <div class="uniform-swatch-list">
-                    {% for part in post.uniform_parts %}
-                    <span class="uniform-swatch" title="{{ part.label }}: {{ part.color }}"><i style="background: {{ part.color }}"></i>{{ part.label }}</span>
-                    {% endfor %}
+                <div>
+                    <strong>Uniforme do {{ post.team.name }}</strong>
+                    {% if post.uniform_parts %}
+                    <div class="uniform-swatch-list">
+                        {% for part in post.uniform_parts %}
+                        <span class="uniform-swatch" title="{{ part.label }}: {{ part.color }}"><i style="background: {{ part.color }}"></i>{{ part.label }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <span class="muted">Não informado neste amistoso.</span>
+                    {% endif %}
                 </div>
-                {% else %}
-                <span>Uniforme a combinar</span>
-                {% endif %}
             </div>
         </div>
+        {% if post.team.owner_id == current_user.id or current_user.is_admin %}
+        <form method="post" action="{{ url_for('challenges.update_friendly_uniform', id=post.id) }}" class="uniform-update-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-grid three">
+                <label class="form-field uniform-color-field">
+                    <span>Camisa</span>
+                    <span class="uniform-color-control"><input class="uniform-color-picker" type="color" name="shirt_color_hex" value="{{ post.uniform_parts[0].color if post.uniform_parts|length > 0 else '#22c55e' }}" aria-label="Selecionar cor da camisa"></span>
+                </label>
+                <label class="form-field uniform-color-field">
+                    <span>Calção</span>
+                    <span class="uniform-color-control"><input class="uniform-color-picker" type="color" name="shorts_color_hex" value="{{ post.uniform_parts[1].color if post.uniform_parts|length > 1 else '#111827' }}" aria-label="Selecionar cor do calção"></span>
+                </label>
+                <label class="form-field uniform-color-field">
+                    <span>Meião</span>
+                    <span class="uniform-color-control"><input class="uniform-color-picker" type="color" name="socks_color_hex" value="{{ post.uniform_parts[2].color if post.uniform_parts|length > 2 else '#ffffff' }}" aria-label="Selecionar cor do meião"></span>
+                </label>
+            </div>
+            <button class="btn ghost" type="submit"><i class="bi bi-palette"></i>Atualizar uniforme</button>
+        </form>
+        {% endif %}
         <p class="muted">{{ post.rules or "Regras padrao de futsal." }}</p>
         <p class="muted">{{ post.notes or "Sem observacoes adicionais." }}</p>
     </article>
