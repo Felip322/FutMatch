@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date, time, timedelta
 
 from app import create_app
 from app.extensions import db
@@ -135,11 +135,11 @@ def test_match_detail_uniforms_come_from_confirmed_friendly():
         assert match.away_uniform_parts[0] == {"label": "Camisa", "color": "#0000FF"}
 
 
-def test_away_owner_can_update_match_uniform():
+def test_future_match_cannot_confirm_score():
     app = create_app(TestConfig)
     with app.app_context():
-        home_owner = User(name="Mandante", email="mandante2@example.com", city="Sao Paulo", state="SP")
-        away_owner = User(name="Visitante", email="visitante2@example.com", city="Sao Paulo", state="SP")
+        home_owner = User(name="Dono", email="future@example.com", city="Sao Paulo", state="SP")
+        away_owner = User(name="Visitante", email="future-away@example.com", city="Sao Paulo", state="SP")
         home_owner.set_password("Senha123!")
         away_owner.set_password("Senha123!")
         db.session.add_all([home_owner, away_owner])
@@ -148,43 +148,23 @@ def test_away_owner_can_update_match_uniform():
         away = Team(name="Fora FC", slug="fora-fc", city="Sao Paulo", state="SP", owner_id=away_owner.id)
         db.session.add_all([home, away])
         db.session.flush()
-        post = FriendlyMatchPost(
-            team_id=home.id,
-            match_date=date.today(),
-            start_time=time(21),
-            location_name="Quadra Teste",
-            address="Rua Teste, 10",
-            city="Sao Paulo",
-            state="SP",
-        )
-        db.session.add(post)
-        db.session.flush()
-        request = FriendlyMatchRequest(post_id=post.id, requester_team_id=away.id, status="Aceita")
-        db.session.add(request)
-        db.session.flush()
-        post.accepted_request_id = request.id
-        match = Match(home_team_id=home.id, away_team_id=away.id, match_date=post.match_date, start_time=post.start_time)
+        match = Match(home_team_id=home.id, away_team_id=away.id, match_date=date.today() + timedelta(days=1), start_time=time(21))
         db.session.add(match)
         db.session.commit()
-        away_owner_id = away_owner.id
+        user_id = home_owner.id
         match_id = match.id
-        request_id = request.id
 
     client = app.test_client()
     with client.session_transaction() as session:
-        session["_user_id"] = str(away_owner_id)
+        session["_user_id"] = str(user_id)
 
-    response = client.post(f"/matches/{match_id}/uniform", data={
-        "side": "away",
-        "shirt_color_hex": "#123456",
-        "shorts_color_hex": "#654321",
-        "socks_color_hex": "#abcdef",
-    })
+    response = client.get(f"/matches/{match_id}/confirm-result")
 
     assert response.status_code == 302
     with app.app_context():
-        request = db.session.get(FriendlyMatchRequest, request_id)
-        assert request.uniform_color == "Camisa: #123456 / Calção: #654321 / Meião: #ABCDEF"
+        match = db.session.get(Match, match_id)
+        assert match.home_score is None
+        assert match.away_score is None
 
 
 def test_owner_can_cancel_match_and_original_friendly():

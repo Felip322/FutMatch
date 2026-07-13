@@ -46,7 +46,5 @@
     .report-row { grid-template-columns: 1fr; }
     .row-with-status { grid-template-columns: 1fr; }
     .row-with-status em { grid-column: 1; grid-row: auto; justify-self: flex-start; }
-    .match-uniform-form { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .match-uniform-form .btn { grid-column: 1 / -1; }
     .stats-band div, .data-card, .feature-card, .step-card, .team-card, .player-card, .form-card { padding: 16px; }
 }

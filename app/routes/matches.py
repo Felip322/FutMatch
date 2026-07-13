@@ -7,7 +7,7 @@ from app.extensions import db
 from app.models import FriendlyMatchPost, Match, MatchResultConfirmation, SimpleFairPlayReview, Team
 from app.services.notification_service import notify
 from app.services.badge_service import award_team_badges
-from app.services.uniform_service import build_uniform_description, parse_uniform_description
+from app.services.uniform_service import parse_uniform_description
 from app.utils.file_upload import save_upload
 
 matches_bp = Blueprint("matches", __name__)
@@ -70,38 +70,7 @@ def detail(id):
     if not can_access_match(match):
         return render_template("errors/403.html"), 403
     attach_match_uniforms(match)
-    return render_template("matches/detail.html", match=match)
-
-
-@matches_bp.route("/matches/<int:id>/uniform", methods=["POST"])
-@login_required
-def update_uniform(id):
-    match = Match.query.get_or_404(id)
-    if not can_access_match(match):
-        return render_template("errors/403.html"), 403
-    attach_match_uniforms(match)
-    side = request.form.get("side")
-    team_ids = owned_team_ids()
-    if side == "home":
-        if not current_user.is_admin and match.home_team_id not in team_ids:
-            return render_template("errors/403.html"), 403
-        if not match.friendly_post:
-            flash("Nao encontrei o amistoso original para atualizar o uniforme do mandante.", "danger")
-            return redirect(url_for("matches.detail", id=match.id))
-        match.friendly_post.uniform = build_uniform_description(request.form)
-    elif side == "away":
-        if not current_user.is_admin and match.away_team_id not in team_ids:
-            return render_template("errors/403.html"), 403
-        if not match.accepted_request:
-            flash("Nao encontrei a solicitacao aceita para atualizar o uniforme do visitante.", "danger")
-            return redirect(url_for("matches.detail", id=match.id))
-        match.accepted_request.uniform_color = build_uniform_description(request.form)
-    else:
-        flash("Lado do uniforme invalido.", "danger")
-        return redirect(url_for("matches.detail", id=match.id))
-    db.session.commit()
-    flash("Uniforme atualizado.", "success")
-    return redirect(url_for("matches.detail", id=match.id))
+    return render_template("matches/detail.html", match=match, can_confirm_result=match.match_date <= date.today())
 
 
 @matches_bp.route("/matches/<int:id>/cancel", methods=["POST"])
@@ -146,6 +115,9 @@ def confirm_result(id):
     team_ids = owned_team_ids()
     if not current_user.is_admin and match.home_team_id not in team_ids and match.away_team_id not in team_ids:
         return render_template("errors/403.html"), 403
+    if match.match_date > date.today():
+        flash("A confirmação de placar só fica disponível depois da data do jogo.", "warning")
+        return redirect(url_for("matches.detail", id=match.id))
     if request.method == "POST":
         happened = request.form.get("happened") == "yes"
         team_id = match.home_team_id if match.home_team_id in team_ids else match.away_team_id

@@ -24,16 +24,6 @@
             <small>uniforme não informado</small>
             {% endif %}
         </div>
-        {% if current_user.is_admin or match.home_team.owner_id == current_user.id %}
-        <form method="post" action="/matches/{{ match.id }}/uniform" class="match-uniform-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="side" value="home">
-            <label><span>Camisa</span><input class="uniform-color-picker" type="color" name="shirt_color_hex" value="{{ match.home_uniform_parts[0].color if match.home_uniform_parts|length > 0 else '#22c55e' }}"></label>
-            <label><span>Calção</span><input class="uniform-color-picker" type="color" name="shorts_color_hex" value="{{ match.home_uniform_parts[1].color if match.home_uniform_parts|length > 1 else '#111827' }}"></label>
-            <label><span>Meião</span><input class="uniform-color-picker" type="color" name="socks_color_hex" value="{{ match.home_uniform_parts[2].color if match.home_uniform_parts|length > 2 else '#ffffff' }}"></label>
-            <button class="btn ghost" type="submit">Atualizar mandante</button>
-        </form>
-        {% endif %}
         <div class="team-uniform-row">
             <strong>Visitante:</strong>
             <span>{{ match.away_team.name }}</span>
@@ -47,16 +37,6 @@
             <small>uniforme não informado</small>
             {% endif %}
         </div>
-        {% if current_user.is_admin or match.away_team.owner_id == current_user.id %}
-        <form method="post" action="/matches/{{ match.id }}/uniform" class="match-uniform-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="side" value="away">
-            <label><span>Camisa</span><input class="uniform-color-picker" type="color" name="shirt_color_hex" value="{{ match.away_uniform_parts[0].color if match.away_uniform_parts|length > 0 else '#2563eb' }}"></label>
-            <label><span>Calção</span><input class="uniform-color-picker" type="color" name="shorts_color_hex" value="{{ match.away_uniform_parts[1].color if match.away_uniform_parts|length > 1 else '#ffffff' }}"></label>
-            <label><span>Meião</span><input class="uniform-color-picker" type="color" name="socks_color_hex" value="{{ match.away_uniform_parts[2].color if match.away_uniform_parts|length > 2 else '#2563eb' }}"></label>
-            <button class="btn ghost" type="submit">Atualizar visitante</button>
-        </form>
-        {% endif %}
         <p><strong>Status:</strong> {{ match.status }}</p>
         <p><strong>Resultado:</strong> {{ match.result_status }}</p>
         <p>{{ match.notes or "Amistoso confirmado entre os responsáveis dos times." }}</p>
@@ -70,9 +50,11 @@
         <h2>Resultado</h2>
         {% if match.status == "Cancelado" %}
         <p class="muted">Partida cancelada. O motivo fica registrado no resumo.</p>
-        {% elif match.home_score is none and match.away_score is none %}
+        {% elif match.home_score is none and match.away_score is none and can_confirm_result %}
         <p class="muted">Depois da data do jogo, os responsaveis recebem uma notificacao para informar se aconteceu e qual foi o placar.</p>
         <a class="btn accent full" href="{{ url_for('matches.confirm_result', id=match.id) }}">Confirmar jogo e placar</a>
+        {% elif match.home_score is none and match.away_score is none %}
+        <p class="muted">A confirmação de placar fica disponível após a data do jogo: {{ match.match_date.strftime("%d/%m/%Y") }}.</p>
         {% else %}
         <p>Placar registrado e estatisticas salvas.</p>
         <a class="btn ghost full" href="{{ url_for('matches.simple_review', id=match.id) }}">Avaliar fair play</a>
