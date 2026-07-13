@@ -73,7 +73,7 @@ def create_app(config_class=Config):
             "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://fonts.googleapis.com; "
             "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; "
             "img-src 'self' data: https: https://*.tile.openstreetmap.org https://tile.openstreetmap.org; "
-            "connect-src 'self' https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://tile.openstreetmap.org; "
+            "connect-src 'self' https://servicodados.ibge.gov.br https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://tile.openstreetmap.org; "
             "frame-ancestors 'none'; "
             "base-uri 'self'; "
             "form-action 'self'"

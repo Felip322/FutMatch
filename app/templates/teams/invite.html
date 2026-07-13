@@ -30,7 +30,7 @@
         <label class="form-field"><span>Quadra cadastrada</span><select class="input" name="court_id"><option value="">Usar local manual</option>{% for court in courts %}<option value="{{ court.id }}">{{ court.name }} - {{ court.city }}{% if court.neighborhood %} / {{ court.neighborhood }}{% endif %}</option>{% endfor %}</select></label>
         <div class="form-grid two">
             <label class="form-field"><span>Nome do local</span><input class="input" name="location_name" placeholder="Ex: Arena Central"></label>
-            <label class="form-field"><span>Endereco</span><input class="input" name="address"></label>
+            <label class="form-field"><span>Endereço</span><input class="input" name="address"></label>
             <label class="form-field"><span>Cidade</span><input class="input" name="city" value="{{ my_team.city }}"></label>
             <label class="form-field"><span>Estado</span><input class="input" name="state" value="{{ my_team.state }}" maxlength="2"></label>
             <label class="form-field"><span>Bairro</span><input class="input" name="neighborhood" value="{{ my_team.neighborhood or '' }}"></label>

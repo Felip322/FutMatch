@@ -8,8 +8,8 @@ FLOORS = [("Madeira", "Madeira"), ("Cimento", "Cimento"), ("Sintetico", "Sinteti
 class CourtForm(FlaskForm):
     name = StringField("Nome", validators=[DataRequired(), Length(max=140)])
     description = TextAreaField("Descrição")
-    address = StringField("Endereco", validators=[DataRequired(), Length(max=180)])
-    address_number = StringField("Numero")
+    address = StringField("Endereço", validators=[DataRequired(), Length(max=180)])
+    address_number = StringField("Número")
     city = StringField("Cidade", validators=[DataRequired(), Length(max=100)])
     state = StringField("Estado", validators=[DataRequired(), Length(min=2, max=2)])
     neighborhood = StringField("Bairro")
