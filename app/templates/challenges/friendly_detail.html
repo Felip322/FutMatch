@@ -49,7 +49,7 @@
             </div>
         </div>
         {% if post.team.owner_id == current_user.id or current_user.is_admin %}
-        <form method="post" action="{{ url_for('challenges.update_friendly_uniform', id=post.id) }}" class="uniform-update-form">
+        <form method="post" action="/friendlies/{{ post.id }}/uniform" class="uniform-update-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-grid three">
                 <label class="form-field uniform-color-field">
