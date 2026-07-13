@@ -7,6 +7,7 @@ from app.extensions import db
 from app.models import FriendlyMatchPost, Match, MatchResultConfirmation, SimpleFairPlayReview, Team
 from app.services.notification_service import notify
 from app.services.badge_service import award_team_badges
+from app.services.statistics_service import team_record
 from app.services.uniform_service import parse_uniform_description
 from app.utils.file_upload import save_upload
 
@@ -84,7 +85,13 @@ def detail(id):
     if not can_access_match(match):
         return render_template("errors/403.html"), 403
     attach_match_uniforms(match)
-    return render_template("matches/detail.html", match=match, can_confirm_result=match.match_date <= date.today())
+    return render_template(
+        "matches/detail.html",
+        match=match,
+        can_confirm_result=match.match_date <= date.today(),
+        home_stats=team_record(match.home_team_id),
+        away_stats=team_record(match.away_team_id),
+    )
 
 
 @matches_bp.route("/matches/<int:id>/cancel", methods=["POST"])

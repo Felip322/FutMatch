@@ -199,6 +199,15 @@ td, th { text-align: left; padding: 12px; border-bottom: 1px solid var(--border)
 .uniform-kit-box.missing { background: rgba(255,255,255,.08); border-color: var(--border); }
 .uniform-kit-box span { color: #fff; font-size: .72rem; font-weight: 950; line-height: 1; text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 0 2px rgba(0,0,0,.72); }
 .uniform-kit-box.missing span { color: var(--text-secondary); text-shadow: none; }
+.match-team-summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 14px 0 18px; }
+.match-team-summary { display: grid; gap: 12px; min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius); background: rgba(255,255,255,.035); }
+.match-team-title { display: grid; gap: 5px; min-width: 0; }
+.match-team-title > span { color: var(--text-secondary); font-size: .78rem; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+.match-team-title > strong { overflow: hidden; color: var(--text-primary); font: 900 1.05rem/1.15 var(--font-heading); text-overflow: ellipsis; white-space: nowrap; }
+.match-team-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.match-team-stats span { display: grid; place-items: center; min-height: 58px; padding: 8px 4px; border-radius: 10px; background: rgba(4,10,20,.46); border: 1px solid rgba(255,255,255,.07); text-align: center; }
+.match-team-stats strong { color: var(--accent); font: 900 1.05rem/1 var(--font-heading); }
+.match-team-stats small { margin-top: 5px; color: var(--text-secondary); font-size: .66rem; font-weight: 900; line-height: 1.05; text-transform: uppercase; }
 .cancel-match-card { display: grid; grid-template-columns: minmax(0, .7fr) minmax(320px, 1fr); gap: 18px; align-items: start; margin-top: 22px; border-color: rgba(255,77,94,.26); }
 .cancel-match-form { display: grid; gap: 10px; }
 .cancel-match-form .form-field { margin-bottom: 0; }
