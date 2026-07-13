@@ -150,6 +150,29 @@ def visible_team_badges(team, limit=None):
     return query.limit(limit).all() if limit else query.all()
 
 
+def visible_friendly_card_badges(team, limit=3):
+    priority_codes = {
+        "trusted_team": 10,
+        "fair_play_gold": 20,
+        "punctuality": 30,
+        "no_cancellations": 40,
+        "honest_score": 50,
+        "verified_team": 60,
+        "active_team": 70,
+        "organizer": 80,
+        "good_host": 90,
+        "court_partner": 100,
+        "matches_5": 110,
+        "wins_5": 120,
+    }
+    confusing_on_friendly_card = {"first_match", "first_win"}
+    badges = visible_team_badges(team)
+    preferred = [item for item in badges if item.badge.code in priority_codes]
+    preferred.sort(key=lambda item: priority_codes[item.badge.code])
+    fallback = [item for item in badges if item.badge.code not in priority_codes and item.badge.code not in confusing_on_friendly_card]
+    return (preferred + fallback)[:limit]
+
+
 def queue_achievement_overlay(badges):
     if not has_request_context():
         return

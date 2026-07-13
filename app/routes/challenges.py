@@ -7,7 +7,7 @@ from flask_login import current_user, login_required
 from app.extensions import db
 from app.models import Court, FriendlyMatchHistory, FriendlyMatchPost, FriendlyMatchRequest, Match, Team
 from app.services.notification_service import notify
-from app.services.badge_service import award_team_badges, visible_team_badges
+from app.services.badge_service import award_team_badges, visible_friendly_card_badges
 from app.services.statistics_service import team_record
 
 challenges_bp = Blueprint("challenges", __name__)
@@ -92,7 +92,7 @@ def friendlies():
         for post in posts:
             post.distance_km = distance_km(team.home_latitude, team.home_longitude, post.court.latitude, post.court.longitude) if post.court else None
     for post in posts:
-        post.team_badges = visible_team_badges(post.team, limit=3)
+        post.team_badges = visible_friendly_card_badges(post.team, limit=3)
         post.team_card_stats = team_record(post.team_id)
         post.team_cancellations = FriendlyMatchPost.query.filter_by(team_id=post.team_id, status="Cancelado").count()
     map_points = [
