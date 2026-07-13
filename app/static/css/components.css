@@ -8,6 +8,7 @@
 .icon-btn { position: relative; display: grid; place-items: center; flex: 0 0 auto; width: 42px; height: 42px; border-radius: var(--radius); background: rgba(255,255,255,.05); border: 1px solid var(--border); }
 .count-dot { position: absolute; top: -5px; right: -5px; min-width: 20px; height: 20px; display: none; place-items: center; border-radius: 999px; background: var(--danger); color: white; font-size: 11px; font-weight: 900; }
 .data-card, .feature-card, .step-card, .team-card, .player-card, .form-card { background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015)), var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+.split-layout, .dashboard-grid, .card-grid, .gamification-grid, .badge-panel, .chart-card { margin-top: 22px; }
 .data-card:hover, .feature-card:hover, .team-card:hover { border-color: rgba(183,255,42,.2); transform: translateY(-1px); }
 .form-card-wide { width: min(980px, 100%); margin: 0 auto; }
 .form-section { padding: 18px 0; border-bottom: 1px solid var(--border); }
