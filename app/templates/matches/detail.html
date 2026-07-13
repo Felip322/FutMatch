@@ -11,8 +11,32 @@
 <section class="split-layout">
     <article class="data-card">
         <h2>Resumo</h2>
-        <p><strong>Mandante:</strong> {{ match.home_team.name }}</p>
-        <p><strong>Visitante:</strong> {{ match.away_team.name }}</p>
+        <div class="team-uniform-row">
+            <strong>Mandante:</strong>
+            <span>{{ match.home_team.name }}</span>
+            {% if match.home_uniform_parts %}
+            <div class="uniform-dot-list" aria-label="Uniforme do mandante">
+                {% for part in match.home_uniform_parts %}
+                <i title="{{ part.label }}: {{ part.color }}" style="background: {{ part.color }}"></i>
+                {% endfor %}
+            </div>
+            {% else %}
+            <small>uniforme não informado</small>
+            {% endif %}
+        </div>
+        <div class="team-uniform-row">
+            <strong>Visitante:</strong>
+            <span>{{ match.away_team.name }}</span>
+            {% if match.away_uniform_parts %}
+            <div class="uniform-dot-list" aria-label="Uniforme do visitante">
+                {% for part in match.away_uniform_parts %}
+                <i title="{{ part.label }}: {{ part.color }}" style="background: {{ part.color }}"></i>
+                {% endfor %}
+            </div>
+            {% else %}
+            <small>uniforme não informado</small>
+            {% endif %}
+        </div>
         <p><strong>Status:</strong> {{ match.status }}</p>
         <p><strong>Resultado:</strong> {{ match.result_status }}</p>
         <p>{{ match.notes or "Amistoso confirmado entre os responsáveis dos times." }}</p>

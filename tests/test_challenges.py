@@ -2,8 +2,9 @@ from datetime import date, time
 
 from app import create_app
 from app.extensions import db
-from app.models import FriendlyMatchPost, Team, User
-from app.routes.challenges import build_uniform_description, parse_uniform_description
+from app.models import FriendlyMatchPost, FriendlyMatchRequest, Match, Team, User
+from app.routes.matches import attach_match_uniforms
+from app.services.uniform_service import build_uniform_description, parse_uniform_description
 from config import TestConfig
 
 
@@ -88,3 +89,47 @@ def test_owner_can_update_friendly_uniform_colors():
     with app.app_context():
         post = db.session.get(FriendlyMatchPost, post_id)
         assert post.uniform == "Camisa: #FF0000 / Calção: #000000 / Meião: #FFFFFF"
+
+
+def test_match_detail_uniforms_come_from_confirmed_friendly():
+    app = create_app(TestConfig)
+    with app.app_context():
+        home_owner = User(name="Mandante", email="mandante@example.com", city="Sao Paulo", state="SP")
+        away_owner = User(name="Visitante", email="visitante@example.com", city="Sao Paulo", state="SP")
+        home_owner.set_password("Senha123!")
+        away_owner.set_password("Senha123!")
+        db.session.add_all([home_owner, away_owner])
+        db.session.flush()
+        home = Team(name="Mandante FC", slug="mandante-fc", city="Sao Paulo", state="SP", owner_id=home_owner.id)
+        away = Team(name="Visitante FC", slug="visitante-fc", city="Sao Paulo", state="SP", owner_id=away_owner.id)
+        db.session.add_all([home, away])
+        db.session.flush()
+        post = FriendlyMatchPost(
+            team_id=home.id,
+            match_date=date.today(),
+            start_time=time(20),
+            location_name="Quadra Teste",
+            address="Rua Teste, 10",
+            city="Sao Paulo",
+            state="SP",
+            uniform="Camisa: #FF0000 / Calção: #000000 / Meião: #FFFFFF",
+        )
+        db.session.add(post)
+        db.session.flush()
+        request = FriendlyMatchRequest(
+            post_id=post.id,
+            requester_team_id=away.id,
+            status="Aceita",
+            uniform_color="Camisa: #0000FF / Calção: #FFFFFF / Meião: #0000FF",
+        )
+        db.session.add(request)
+        db.session.flush()
+        post.accepted_request_id = request.id
+        match = Match(home_team_id=home.id, away_team_id=away.id, match_date=post.match_date, start_time=post.start_time)
+        db.session.add(match)
+        db.session.commit()
+
+        attach_match_uniforms(match)
+
+        assert match.home_uniform_parts[0] == {"label": "Camisa", "color": "#FF0000"}
+        assert match.away_uniform_parts[0] == {"label": "Camisa", "color": "#0000FF"}

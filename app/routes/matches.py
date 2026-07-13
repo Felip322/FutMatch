@@ -7,6 +7,7 @@ from app.extensions import db
 from app.models import FriendlyMatchPost, Match, MatchResultConfirmation, SimpleFairPlayReview, Team
 from app.services.notification_service import notify
 from app.services.badge_service import award_team_badges
+from app.services.uniform_service import parse_uniform_description
 from app.utils.file_upload import save_upload
 
 matches_bp = Blueprint("matches", __name__)
@@ -33,6 +34,26 @@ def visible_matches_query():
     return query.filter((Match.home_team_id.in_(team_ids)) | (Match.away_team_id.in_(team_ids)))
 
 
+def friendly_post_for_match(match):
+    return FriendlyMatchPost.query.filter_by(
+        team_id=match.home_team_id,
+        match_date=match.match_date,
+        start_time=match.start_time,
+    ).first()
+
+
+def attach_match_uniforms(match):
+    post = friendly_post_for_match(match)
+    accepted_request = None
+    if post:
+        accepted_request = next((item for item in post.requests if item.id == post.accepted_request_id), None)
+        if not accepted_request:
+            accepted_request = next((item for item in post.requests if item.status == "Aceita"), None)
+    match.home_uniform_parts = parse_uniform_description(post.uniform if post else None)
+    match.away_uniform_parts = parse_uniform_description(accepted_request.uniform_color if accepted_request else None)
+    return match
+
+
 @matches_bp.route("/matches")
 @login_required
 def list_matches():
@@ -46,6 +67,7 @@ def detail(id):
     match = Match.query.get_or_404(id)
     if not can_access_match(match):
         return render_template("errors/403.html"), 403
+    attach_match_uniforms(match)
     return render_template("matches/detail.html", match=match)
 
 
