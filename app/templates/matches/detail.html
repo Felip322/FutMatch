@@ -8,6 +8,40 @@
     </div>
     <div class="scoreboard">{{ match.home_score if match.home_score is not none else "-" }} x {{ match.away_score if match.away_score is not none else "-" }}</div>
 </section>
+{% set post = match.friendly_post %}
+<section class="detail-grid">
+    <article class="data-card">
+        <div class="card-title-row">
+            <h2>Local e horário</h2>
+            {% if match.court %}<span class="court-chip"><i class="bi bi-check-circle"></i>Quadra cadastrada</span>{% endif %}
+        </div>
+        <div class="info-list">
+            <p><i class="bi bi-calendar-event"></i><span>{{ match.match_date.strftime("%d/%m/%Y") }} as {{ match.start_time.strftime("%H:%M") }}</span></p>
+            {% if post %}
+            <p><i class="bi bi-geo-alt"></i><span>{{ post.location_name }} - {{ post.address }}{% if post.court and post.court.address_number %}, {{ post.court.address_number }}{% endif %}</span></p>
+            <p><i class="bi bi-map"></i><span>{{ post.city }}{% if post.neighborhood %}, {{ post.neighborhood }}{% endif %} / {{ post.state }}</span></p>
+            {% elif match.court %}
+            <p><i class="bi bi-geo-alt"></i><span>{{ match.court.name }} - {{ match.court.address }}{% if match.court.address_number %}, {{ match.court.address_number }}{% endif %}</span></p>
+            <p><i class="bi bi-map"></i><span>{{ match.court.city }}{% if match.court.neighborhood %}, {{ match.court.neighborhood }}{% endif %} / {{ match.court.state }}</span></p>
+            {% else %}
+            <p><i class="bi bi-geo-alt"></i><span>Local informado no combinado da partida.</span></p>
+            {% endif %}
+        </div>
+    </article>
+    <article class="data-card">
+        <h2>Regras combinadas</h2>
+        <div class="info-list">
+            {% if post %}
+            <p><i class="bi bi-people"></i><span>{{ post.players_count }}x{{ post.players_count }}</span></p>
+            <p><i class="bi bi-stopwatch"></i><span>{{ post.duration_minutes }} min, tolerância {{ post.tolerance_minutes }} min</span></p>
+            <p><i class="bi bi-card-text"></i><span>{{ post.rules or "Regras padrão de futsal." }}</span></p>
+            {% if post.notes %}<p><i class="bi bi-chat-square-text"></i><span>{{ post.notes }}</span></p>{% endif %}
+            {% else %}
+            <p><i class="bi bi-card-text"></i><span>{{ match.notes or "Amistoso confirmado entre os responsáveis dos times." }}</span></p>
+            {% endif %}
+        </div>
+    </article>
+</section>
 <section class="split-layout">
     <article class="data-card">
         <h2>Resumo</h2>

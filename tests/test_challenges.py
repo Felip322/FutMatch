@@ -135,6 +135,52 @@ def test_match_detail_uniforms_come_from_confirmed_friendly():
         assert match.away_uniform_parts[0] == {"label": "Camisa", "color": "#0000FF"}
 
 
+def test_confirmed_friendly_detail_redirects_to_match_room():
+    app = create_app(TestConfig)
+    with app.app_context():
+        home_owner = User(name="Mandante", email="redirect-home@example.com", city="Sao Paulo", state="SP")
+        away_owner = User(name="Visitante", email="redirect-away@example.com", city="Sao Paulo", state="SP")
+        home_owner.set_password("Senha123!")
+        away_owner.set_password("Senha123!")
+        db.session.add_all([home_owner, away_owner])
+        db.session.flush()
+        home = Team(name="Mandante FC", slug="redirect-mandante", city="Sao Paulo", state="SP", owner_id=home_owner.id)
+        away = Team(name="Visitante FC", slug="redirect-visitante", city="Sao Paulo", state="SP", owner_id=away_owner.id)
+        db.session.add_all([home, away])
+        db.session.flush()
+        post = FriendlyMatchPost(
+            team_id=home.id,
+            match_date=date.today(),
+            start_time=time(20),
+            location_name="Quadra Teste",
+            address="Rua Teste, 10",
+            city="Sao Paulo",
+            state="SP",
+            status="Confirmado",
+        )
+        db.session.add(post)
+        db.session.flush()
+        request = FriendlyMatchRequest(post_id=post.id, requester_team_id=away.id, status="Aceita")
+        db.session.add(request)
+        db.session.flush()
+        post.accepted_request_id = request.id
+        match = Match(home_team_id=home.id, away_team_id=away.id, match_date=post.match_date, start_time=post.start_time)
+        db.session.add(match)
+        db.session.commit()
+        user_id = home_owner.id
+        post_id = post.id
+        match_id = match.id
+
+    client = app.test_client()
+    with client.session_transaction() as session:
+        session["_user_id"] = str(user_id)
+
+    response = client.get(f"/friendlies/{post_id}")
+
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith(f"/matches/{match_id}")
+
+
 def test_future_match_cannot_confirm_score():
     app = create_app(TestConfig)
     with app.app_context():

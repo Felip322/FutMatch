@@ -61,6 +61,20 @@ def court_has_conflict(court_id, match_date, start_time, duration_minutes, ignor
     return any(time_ranges_overlap(start_time, duration_minutes, post.start_time, post.duration_minutes) for post in query)
 
 
+def match_for_confirmed_post(post):
+    if not post.accepted_request_id:
+        return None
+    accepted_request = db.session.get(FriendlyMatchRequest, post.accepted_request_id)
+    if not accepted_request:
+        return None
+    return Match.query.filter_by(
+        home_team_id=post.team_id,
+        away_team_id=accepted_request.requester_team_id,
+        match_date=post.match_date,
+        start_time=post.start_time,
+    ).order_by(Match.id.desc()).first()
+
+
 @challenges_bp.route("/opponents")
 @login_required
 def opponents():
@@ -163,6 +177,10 @@ def create_friendly():
 @login_required
 def friendly_detail(id):
     post = FriendlyMatchPost.query.get_or_404(id)
+    if post.status == "Confirmado":
+        match = match_for_confirmed_post(post)
+        if match:
+            return redirect(url_for("matches.detail", id=match.id))
     team = current_team()
     existing_request = FriendlyMatchRequest.query.filter_by(post_id=post.id, requester_team_id=team.id).first() if team else None
     post.uniform_parts = parse_uniform_description(post.uniform)
@@ -248,7 +266,7 @@ def accept_friendly_request(id):
     notify(friendly_request.requester_team.owner_id, "Amistoso confirmado", f"{post.team.name} aceitou jogar contra seu time.", "amistoso_confirmado", url_for("matches.detail", id=match.id))
     db.session.commit()
     flash("Solicitacao aceita e partida criada.", "success")
-    return redirect(url_for("challenges.friendly_detail", id=post.id))
+    return redirect(url_for("matches.detail", id=match.id))
 
 
 @challenges_bp.route("/friendlies/requests/<int:id>/reject", methods=["POST"])
