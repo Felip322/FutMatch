@@ -35,11 +35,23 @@ def visible_matches_query():
 
 
 def friendly_post_for_match(match):
-    return FriendlyMatchPost.query.filter_by(
+    post = FriendlyMatchPost.query.filter_by(
         team_id=match.home_team_id,
         match_date=match.match_date,
         start_time=match.start_time,
     ).first()
+    if post:
+        return post
+    posts = FriendlyMatchPost.query.filter_by(
+        match_date=match.match_date,
+        start_time=match.start_time,
+    ).all()
+    for candidate in posts:
+        if candidate.team_id != match.home_team_id:
+            continue
+        if any(request.requester_team_id == match.away_team_id and request.status == "Aceita" for request in candidate.requests):
+            return candidate
+    return None
 
 
 def attach_match_uniforms(match):
@@ -47,6 +59,8 @@ def attach_match_uniforms(match):
     accepted_request = None
     if post:
         accepted_request = next((item for item in post.requests if item.id == post.accepted_request_id), None)
+        if not accepted_request:
+            accepted_request = next((item for item in post.requests if item.requester_team_id == match.away_team_id and item.status == "Aceita"), None)
         if not accepted_request:
             accepted_request = next((item for item in post.requests if item.status == "Aceita"), None)
     match.friendly_post = post
