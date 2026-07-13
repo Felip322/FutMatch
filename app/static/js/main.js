@@ -1,7 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const shouldUppercase = (field) => {
+        if (!field.matches("input, textarea")) return false;
+        if (field.type && ["email", "password", "url", "number", "date", "time", "datetime-local", "month", "week", "file", "hidden", "checkbox", "radio", "submit", "button"].includes(field.type)) return false;
+        if (field.dataset.keepCase === "true") return false;
+        return true;
+    };
+
+    const uppercaseField = (field) => {
+        const start = field.selectionStart;
+        const end = field.selectionEnd;
+        field.value = field.value.toLocaleUpperCase("pt-BR");
+        if (typeof start === "number" && typeof end === "number") {
+            field.setSelectionRange(start, end);
+        }
+    };
+
+    document.querySelectorAll("input, textarea").forEach((field) => {
+        if (!shouldUppercase(field)) return;
+        if (field.value) uppercaseField(field);
+        field.addEventListener("input", () => uppercaseField(field));
+        field.addEventListener("change", () => uppercaseField(field));
+    });
+
     document.querySelectorAll("form").forEach((form) => {
         form.addEventListener("submit", () => {
             if (form.classList.contains("ajax-like") || form.classList.contains("ajax-comment")) return;
+            form.querySelectorAll("input, textarea").forEach((field) => {
+                if (shouldUppercase(field)) uppercaseField(field);
+            });
             const button = form.querySelector("button[type='submit'], input[type='submit']");
             if (button) setTimeout(() => button.setAttribute("disabled", "disabled"), 0);
         });
