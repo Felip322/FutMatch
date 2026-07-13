@@ -137,7 +137,8 @@ td, th { text-align: left; padding: 12px; border-bottom: 1px solid var(--border)
 .friendly-card-body { display: flex; flex-direction: column; gap: 16px; min-width: 0; height: 100%; }
 .friendly-card-body > .btn { margin-top: auto; }
 .friendly-badges { display: flex; flex-wrap: wrap; gap: 8px; }
-.friendly-badges .mini-badge { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 7px 11px; border-radius: 999px; color: var(--accent); background: rgba(183,255,42,.1); border: 1px solid rgba(183,255,42,.18); font-size: .86rem; line-height: 1.1; }
+.friendly-badges .mini-badge { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border-radius: 12px; color: var(--accent); background: rgba(183,255,42,.1); border: 1px solid rgba(183,255,42,.18); }
+.friendly-badges .mini-badge img { width: 22px; height: 22px; }
 .friendly-info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .friendly-info-grid span, .friendly-info-grid a { display: flex; align-items: center; gap: 8px; min-height: 42px; min-width: 0; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.045); color: var(--text-secondary); line-height: 1.2; }
 .friendly-info-grid i { flex: 0 0 auto; color: var(--text-secondary); }

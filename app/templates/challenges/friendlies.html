@@ -41,7 +41,7 @@
             {% if post.team_badges %}
             <div class="friendly-badges" aria-label="Selos do time">
                 {% for item in post.team_badges %}
-                <span class="mini-badge"><img src="{{ url_for('static', filename='images/badges/' ~ item.badge.icon ~ '.svg') }}" alt="">{{ item.badge.name }}</span>
+                <span class="mini-badge" title="{{ item.badge.name }}" aria-label="{{ item.badge.name }}"><img src="{{ url_for('static', filename='images/badges/' ~ item.badge.icon ~ '.svg') }}" alt="{{ item.badge.name }}"></span>
                 {% endfor %}
             </div>
             {% endif %}
