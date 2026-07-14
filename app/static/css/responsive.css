@@ -28,7 +28,7 @@
     .hero-actions, .actions-inline { flex-direction: column; align-items: stretch; }
     .profile-head, .match-room { align-items: flex-start; flex-direction: column; padding: 20px; }
     .match-room-header { align-items: flex-start; flex-direction: column; width: 100%; }
-    .match-club-panel, .match-club-panel.away { width: 100%; min-height: 118px; text-align: left; justify-items: start; }
+    .match-club-panel, .match-club-panel.away { width: 100%; min-height: 142px; text-align: center; justify-items: center; }
     .match-score-panel { width: 100%; min-width: 0; }
     .match-room-meta span { width: 100%; border-radius: var(--radius); }
     .match-team-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
